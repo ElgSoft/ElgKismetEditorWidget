@@ -4,11 +4,11 @@
  The plugin add basic Graph events like **OnGraphCompiled**, **OnNodeSelectionChanged**, **OnFocusGraphChanged**.<br> 
  It also add nodes to create/edit/remove Variables, Functions, Macros, EventDispatchers, EventGraph.
 
-![GetEditorWidget](http://elgsoft.com/Images/KEW/Kew_SelectWindow.png)<br>
+![Kew_SelectWindow](http://elgsoft.com/Images/KEW/Kew_SelectWindow.png)<br>
 
-<br>
-It support all functionlity needed to recreate the MyBlueprint window inside Editor Utility Widget.
-![KEW_myBP.png](http://elgsoft.com/Images/KEW/KEW_myBP.png)<br>
+It support all functionlity needed to recreate the MyBlueprint window inside Editor Utility Widget.<br>
+![KEW_myBP](http://elgsoft.com/Images/KEW/KEW_myBP.png)<br>
+
 
 ## Setup
 
