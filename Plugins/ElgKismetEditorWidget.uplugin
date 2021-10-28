@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "ElgKismetEditorWidget",
+	"Description": "Add support to use EditorUtilityWidgets inside a Blueprint Editor. It also add some support to get/edit nodes, variables, functions etc.",
+	"Category": "Scripting",
+	"CreatedBy": "ElgSoft",
+	"CreatedByURL": "www.ElgSoft.com",
+	"DocsURL": "ElgSoft.com",
+	"MarketplaceURL": "",
+	"SupportURL": "mailto:EditorScripting@ElgSoft.com",
+	"EngineVersion": "4.27.0",
+	"CanContainContent": true,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "ElgKismetEditorWidget",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
+		}
+	]
+}

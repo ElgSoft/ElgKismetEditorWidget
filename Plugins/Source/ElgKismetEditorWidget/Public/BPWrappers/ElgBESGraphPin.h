@@ -1,0 +1,156 @@
+// Copyright 2019-2021 ElgSoft. All rights reserved. 
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/NoExportTypes.h"
+#include "ElgKEWEnum.h"
+#include "ElgKEWStructs.h"
+#include "ElgBESGraphPin.generated.h"
+
+/**
+ * 
+ */
+UCLASS(Blueprintable)
+class ELGKISMETEDITORWIDGET_API UElgBESGraphPin : public UObject
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY()
+		FName PinName;
+	UPROPERTY()
+		FGuid PinId;
+
+	class UEdGraphNode* NodePtr;
+	class UBlueprint* BlueprintPtr;
+	class UEdGraph* GraphPtr;
+
+	void Setup(UEdGraphPin* InPin);
+
+	UFUNCTION(BlueprintCallable, Category = "KismetEditorWidget|Pin")
+		void SelectPin();
+
+	/** Break all links from this pin */
+	UFUNCTION(BlueprintCallable, Category = "KismetEditorWidget|Pin")
+		void BreakAllPinLinks(bool bNotifyNodes = true);
+
+	/** Break a link to the specified pin (if present) */
+	UFUNCTION(BlueprintCallable, Category = "KismetEditorWidget|Pin")
+		void BreakLinkTo(UElgBESGraphPin* InPinToBreak);
+
+	/** Create a link. Note, this does not check that schema allows it, and will not break any existing connections */
+	UFUNCTION(BlueprintCallable, Category = "KismetEditorWidget|Pin")
+		void MakeLinkTo(UElgBESGraphPin* InPinToLink);
+
+	/** Reset default values to empty. */
+	UFUNCTION(BlueprintCallable, Category = "KismetEditorWidget|Pin")
+		void ResetDefaultValue();
+
+	/** Promote the pin to a variable,
+		@param	bInToMemberVariable		TRUE if attempting to create a member variable, FALSE if the variable should be local
+	*/
+	UFUNCTION(BlueprintCallable, Category = "KismetEditorWidget|Pin")
+		void PromoteToVariable(const bool bInToMemberVariable);
+
+
+#pragma region Getters
+
+	/* Get if the pin is visible and a data pin */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetIsVisibleData", CompactNodeTitle = "VisibleData"))
+	bool IsVisibleData();
+
+	/* Get the friendly name if it has one or the real name */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetName", CompactNodeTitle = "Name"))
+		FName GetPinCleanName();
+
+	/* Get the type, Category or sub object type. */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetType", CompactNodeTitle = "Type"))
+		FString GetType();
+
+
+	/* Get the real pin name */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GePintName", CompactNodeTitle = "PinName"))
+		FName GetPinName();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetId", CompactNodeTitle = "Id"))
+		FGuid GetPinId();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetGuid", CompactNodeTitle = "Guid"))
+		FGuid GetPinGuid();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetGuidString", CompactNodeTitle = "GuidString"))
+		FString GetPinGuidAsString();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetConnected", CompactNodeTitle = "bConnected"))
+		bool GetPinConnected();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetHidden", CompactNodeTitle = "bHidden"))
+		bool GetPinIsHidden();
+
+
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetLinkedTo", CompactNodeTitle = "LinkedTo"))
+		TArray<UElgBESGraphPin*> GetPinLinkedTo();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "PinCategory", CompactNodeTitle = "PinCategory"))
+		FName GetPinCategory();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "PinSubCategory", CompactNodeTitle = "PinSubCategory"))
+		FName GetPinSubCategory();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "PinSubObject", CompactNodeTitle = "PinSubObject"))
+		UObject* GetPinSubObject();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetInput", CompactNodeTitle = "Input"))
+		bool GetPinIsInput();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetOutput", CompactNodeTitle = "Output"))
+		bool GetPinIsOutput();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetDirection", CompactNodeTitle = "Direction"))
+		EBPElgKEWPinDirection GetPinDirection();
+
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetTipText", CompactNodeTitle = "TipText"))
+		FString GetPinTipText();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetType", CompactNodeTitle = "Type"))
+		FS_ElgGraphPinType GetPinType();
+
+	/** Default value for this pin (used if the pin has no connections), stored as a string */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetDefaultValue", CompactNodeTitle = "DefaultValue"))
+		FString GetPinDefaultValue();
+	/** Initial default value (the autogenerated value, to identify if the user has modified the value), stored as a string */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetAutogeneratedDefaultValue", CompactNodeTitle = "AutoDefaultValue"))
+		FString GetPinAutogeneratedDefaultValue();
+	/** If the default value for this pin should be an object, we store a pointer to it */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetDefaultObject", CompactNodeTitle = "DefaultObject"))
+		UObject* GetPinDefaultObject();
+	/** If the default value for this pin should be an FText, it is stored here. */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetDefaultTextValue", CompactNodeTitle = "DefaultTextValue"))
+		FText GetPinDefaultTextValue();
+
+	/** If true, this connector is unconnectable, and present only to allow the editing of the default text. */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetbNotConnectable", CompactNodeTitle = "bNotConnectable"))
+		bool GetPinNotConnectable();
+
+	/** If true, the default value of this connector is fixed and cannot be modified by the user (it's visible for reference only). */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetbDefaultValueIsReadOnly", CompactNodeTitle = "bDefaultValueIsReadOnly"))
+		bool GetPinDefaultValueIsReadOnly();
+	/** If true, the default value on this pin is ignored and should not be set. */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetbDefaultValueIsIgnored", CompactNodeTitle = "bDefaultValueIsIgnored"))
+		bool GetPinDefaultValueIsIgnored();
+	/** If true, the pin may be hidden by user. */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetbIsDiffing", CompactNodeTitle = "bIsDiffing"))
+		bool GetPinbIsDiffing();
+	/** If true, the pin is displayed as ref. This is transient. */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetbDisplayAsMutableRef", CompactNodeTitle = "bDisplayAsMutableRef"))
+		bool GetPinbDisplayAsMutableRef();
+	/** If true, the pin's name will be allowed to be made friendly by the editor. */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetbAllowFriendlyName", CompactNodeTitle = "bAllowFriendlyName"))
+		bool GetPinAllowFriendlyName();
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetPinFriendlyName", CompactNodeTitle = "FriendlyName"))
+		FText GetPinPinFriendlyName();
+
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Pin", meta = (DisplayName = "GetIsValid", CompactNodeTitle = "IsValid"))
+		bool GetIsValid();
+
+	UFUNCTION(BlueprintCallable, Category = "KismetEditorWidget|Pin", meta = (ExpandEnumAsExecs = "Branch"))
+		void IsValidBranch(EBPElgKEWWResult& Branch);
+
+#pragma endregion
+
+	class UEdGraphPin* GetPin();
+	bool Validate();
+
+
+	static UElgBESGraphPin* MakeGraphPinObject(UEdGraphPin* InPin);
+};
