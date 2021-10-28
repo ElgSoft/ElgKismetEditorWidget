@@ -1,7 +1,8 @@
 # ElgKismetEditorWidget
  This is an Unreal Engine 4.27 editor only plugin to make it possible to use Editor Utility Widgets inside the Blueprint Editor.
  <br>
- The plugin add basic Graph events like **OnGraphCompiled**, **OnNodeSelectionChanged**, **OnFocusGraphChanged** and more. It also add nodes to create/edit/remove Variables, Functions, Macros, EventDispatchers, EventGraph.
+ The plugin add basic Graph events like **OnGraphCompiled**, **OnNodeSelectionChanged**, **OnFocusGraphChanged**.<br> 
+ It also add nodes to create/edit/remove Variables, Functions, Macros, EventDispatchers, EventGraph.
 
 ![GetEditorWidget](http://elgsoft.com/Images/KEW/Kew_SelectWindow.png)<br>
 
