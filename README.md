@@ -8,7 +8,7 @@
 
 <br>
 It support all functionlity needed to recreate the MyBlueprint window inside Editor Utility Widget.
-![GetEditorWidget](http://elgsoft.com/Images/KEW/KEW_myBP.png)<br>
+![KEW_myBP.png](http://elgsoft.com/Images/KEW/KEW_myBP.png)<br>
 
 ## Setup
 
