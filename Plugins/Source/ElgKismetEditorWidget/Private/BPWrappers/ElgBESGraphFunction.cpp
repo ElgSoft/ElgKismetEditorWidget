@@ -204,12 +204,10 @@ void UElgBESGraphFunction::Remove(const bool bShowDialog /*= false*/)
 		}
 		FBlueprintEditorUtils::RemoveGraph(GetBlueprint(), GraphPtr, EGraphRemoveFlags::Recompile);
 
-		for (TObjectIterator<UK2Node_CreateDelegate> It(RF_ClassDefaultObject, /** bIncludeDerivedClasses */ true, /** InternalExcludeFlags */ EInternalObjectFlags::PendingKill); It; ++It)
+		for (TObjectIterator<UK2Node_CreateDelegate> It(RF_ClassDefaultObject, /** bIncludeDerivedClasses */ true, /** InternalExcludeFlags */ EInternalObjectFlags::Garbage); It; ++It)
 		{
-			if (It->GetGraph() != GraphPtr) {
-				if (!It->IsPendingKill() && It->GetGraph() && !It->GetGraph()->IsPendingKill()) {
-					It->HandleAnyChange();
-				}
+			if (IsValid(*It) && It->GetGraph() && IsValid(It->GetGraph()) && It->GetGraph() != GraphPtr) {
+				It->HandleAnyChange();
 			}
 		}
 		

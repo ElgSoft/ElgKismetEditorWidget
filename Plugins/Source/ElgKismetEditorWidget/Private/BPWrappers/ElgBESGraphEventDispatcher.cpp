@@ -44,9 +44,9 @@ void UElgBESGraphEventDispatcher::RemoveEventDispatcher()
 	}
 	FBlueprintEditorUtils::RemoveGraph(BlueprintPtr, GraphPtr, EGraphRemoveFlags::Recompile);
 
-	for (TObjectIterator<UK2Node_CreateDelegate> It(RF_ClassDefaultObject, /** bIncludeDerivedClasses */ true, /** InternalExcludeFlags */ EInternalObjectFlags::PendingKill); It; ++It)
+	for (TObjectIterator<UK2Node_CreateDelegate> It(RF_ClassDefaultObject, /** bIncludeDerivedClasses */ true, /** InternalExcludeFlags */ EInternalObjectFlags::Garbage); It; ++It)
 	{
-		if (!It->IsPendingKill() && It->GetGraph() && !It->GetGraph()->IsPendingKill()) {
+		if (IsValid(*It) && It->GetGraph() && IsValid(It->GetGraph())) {
 			It->HandleAnyChange();
 		}
 	}

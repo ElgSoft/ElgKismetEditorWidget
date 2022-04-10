@@ -56,7 +56,7 @@
 
 UElgEditorContext_BlueprintEditor::~UElgEditorContext_BlueprintEditor()
 {
-	FTicker::GetCoreTicker().RemoveTicker(myTickDelegateHandle);
+	FTSTicker::GetCoreTicker().RemoveTicker(myTickDelegateHandle);
 
 	if (BlueprintEditorPtr.IsValid()) {
 		BlueprintEditorPtr.Pin()->OnRefresh().Remove(EditorRefreshDelegate);
@@ -109,7 +109,7 @@ void UElgEditorContext_BlueprintEditor::Setup(TWeakPtr<class FBlueprintEditor> I
 void UElgEditorContext_BlueprintEditor::Cleanup()
 {
 	bOnGraphChanged = false;
-	FTicker::GetCoreTicker().RemoveTicker(myTickDelegateHandle);
+	FTSTicker::GetCoreTicker().RemoveTicker(myTickDelegateHandle);
 
 	if (BlueprintEditorPtr.IsValid()) {
 		BlueprintEditorPtr.Pin()->OnRefresh().Remove(EditorRefreshDelegate);
@@ -153,9 +153,9 @@ void UElgEditorContext_BlueprintEditor::UpdateBlueprintEditor(TWeakPtr<class FBl
 
 void UElgEditorContext_BlueprintEditor::SetupTicker()
 {
-	if (myTickDelegateHandle.IsValid()) FTicker::GetCoreTicker().RemoveTicker(myTickDelegateHandle);
-	myTickDelegate = FTickerDelegate::CreateUObject(this, &UElgEditorContext_BlueprintEditor::MyTick);
-	myTickDelegateHandle = FTicker::GetCoreTicker().AddTicker(myTickDelegate, myTickDelay);
+	if (myTickDelegateHandle.IsValid()) FTSTicker::GetCoreTicker().RemoveTicker(myTickDelegateHandle);
+	myTickDelegate =  FTickerDelegate::CreateUObject(this, &UElgEditorContext_BlueprintEditor::MyTick);
+	myTickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(myTickDelegate, myTickDelay);
 }
 
 bool UElgEditorContext_BlueprintEditor::MyTick(float DeltaSeconds)
@@ -396,10 +396,7 @@ void UElgEditorContext_BlueprintEditor::SummonFindAndReplaceUI()
 
 bool UElgEditorContext_BlueprintEditor::InDebuggingMode()
 {
-	if (BlueprintEditorPtr.IsValid()) {
-		return BlueprintEditorPtr.Pin()->InDebuggingMode();
-	}
-	return false;		 
+	return FSlateApplication::Get().InKismetDebuggingMode();
 }
 
 bool UElgEditorContext_BlueprintEditor::InEditingMode()
@@ -483,21 +480,17 @@ void UElgEditorContext_BlueprintEditor::SetUISelectionState(const FName InSelect
 	}
 }
 
-
+// #UE5: #Remove NativeCodeGeneration has been removed.
 bool UElgEditorContext_BlueprintEditor::CanGenerateNativeCode()
 {
-	if (BlueprintEditorPtr.IsValid()) {
-		return BlueprintEditorPtr.Pin()->CanGenerateNativeCode();
-	}
+	UE_LOG(LogElgKismetEditorWidget, Error, TEXT("NativeCodeGeneration has been removed in UE5."));
 	return false;
 }
 
-
+// #UE5: #Remove NativeCodeGeneration has been removed.
 void UElgEditorContext_BlueprintEditor::OpenNativeCodeGenerationTool()
 {
-	if (BlueprintEditorPtr.IsValid()) {
-		BlueprintEditorPtr.Pin()->OpenNativeCodeGenerationTool();
-	}
+	UE_LOG(LogElgKismetEditorWidget, Error, TEXT("NativeCodeGeneration has been removed in UE5."));
 }
 
 
@@ -517,12 +510,9 @@ bool UElgEditorContext_BlueprintEditor::IsToggleHideUnrelatedNodesChecked()
 	return false;
 }
 
-
+// #UE5 #Remove Remove next update
 bool UElgEditorContext_BlueprintEditor::ShouldShowToggleHideUnrelatedNodes(bool bInIsToolbar)
 {
-	if (BlueprintEditorPtr.IsValid()) {
-		return BlueprintEditorPtr.Pin()->ShouldShowToggleHideUnrelatedNodes(bInIsToolbar);
-	}
 	return false;
 }
 

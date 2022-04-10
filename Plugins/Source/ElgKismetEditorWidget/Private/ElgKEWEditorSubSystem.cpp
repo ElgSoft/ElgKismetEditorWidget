@@ -16,7 +16,7 @@ void UElgKEWEditorSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UElgKEWEditorSubSystem::Deinitialize()
 {
-}
+}				
 
 #pragma endregion
 

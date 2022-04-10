@@ -61,8 +61,8 @@ public:
 	/* Delay between each process tick */
 	UPROPERTY()
 		float myTickDelay = 0.1f;
-	FTickerDelegate myTickDelegate;
-	FDelegateHandle myTickDelegateHandle;
+	FTickerDelegate myTickDelegate;	
+	FTSTicker::FDelegateHandle myTickDelegateHandle;
 	void SetupTicker();
 	bool MyTick(float DeltaSeconds);
 
@@ -210,11 +210,11 @@ public:
 		void SetUISelectionState(const FName InSelectionOwner);
 
 	/** Can generate native code for current blueprint */
-	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Editor")
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Editor", meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated as NativeCodeGeneration is no longer supported."))
 		bool CanGenerateNativeCode();
 
 	/** Opens a native code generation modal window */
-	UFUNCTION(BlueprintCallable, Category = "KismetEditorWidget|Editor")
+	UFUNCTION(BlueprintCallable, Category = "KismetEditorWidget|Editor", meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated as NativeCodeGeneration is no longer supported."))
 		void OpenNativeCodeGenerationTool();
 
 	/** Make nodes which are unrelated to the selected nodes fade out */
@@ -222,7 +222,9 @@ public:
 		void ToggleHideUnrelatedNodes();
 	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Editor")
 		bool IsToggleHideUnrelatedNodesChecked();
-	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Editor")
+
+	/* No longer needed as the button is always shown now */
+	UFUNCTION(BlueprintPure, Category = "KismetEditorWidget|Editor", meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated as the Toggle Hide Unrelated Nodes button is always shown now."))
 		bool ShouldShowToggleHideUnrelatedNodes(bool bInIsToolbar);
 
 	/* Get all the Category's used by the blueprint */
