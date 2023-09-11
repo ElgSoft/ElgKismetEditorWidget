@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
@@ -48,9 +48,7 @@ public:
 
 #pragma endregion
 
-
-	bool Validate(const FString InNodeName);
-
+	
 	void Setup(UBlueprint* InBlueprint, UEdGraph* InGraph, UK2Node_FunctionEntry* InEntry, FBPVariableDescription InVariableDescription);
 
 #pragma region overrides
@@ -58,7 +56,7 @@ public:
 	virtual EBPElgBESVariableType GetVarType() override;
 	virtual FName DuplicateVar() override;
 	virtual FProperty* GetProperty() override;
-	virtual bool IsVarValid();
+	virtual bool IsVarValid() override;
 	virtual FString GetDefaultValue() override;
 	virtual UFunction* GetVariableScope() override;
 	virtual bool ValidateAndUpdate() override;

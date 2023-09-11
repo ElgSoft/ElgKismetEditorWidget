@@ -1,13 +1,21 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "ElgKEWStructs.h"
 #include "ElgKEWEnum.h"
 #include "ElgEditorContext_BlueprintEditor.generated.h"
 
+class UElgBESGraphWidget;
+class UElgBESGraphWidgetVariable;
+class UElgBESGraphFunctionPin;
+class UElgBESGraphVariableInherited;
+class UElgBESGraphMacro;
+class UDragDropOperation;
+class UElgBESGraphFunction;
+class UElgBESGraphInterface;
+class UElgBESGraphUber;
 class UEdGraph;
 class UElgBESGraphNode;
 class UElgBESGraphVariableLocal;
@@ -44,9 +52,9 @@ public:
 
 #pragma region Setup
 
-	virtual ~UElgEditorContext_BlueprintEditor();
+	virtual ~UElgEditorContext_BlueprintEditor() override;
 
-	void Setup(TWeakPtr<class FBlueprintEditor> InEditor);
+	void Setup(TWeakPtr<FBlueprintEditor> InEditor);
 
 	void Cleanup();
 
@@ -504,7 +512,7 @@ public:
 	/* Event when the Blueprint is compiled */
 	UPROPERTY(BlueprintAssignable)
 		FElgKEWOnCompileSignature OnGraphCompiled;
-	void HandleOnCompiled(class UBlueprint* InBlueprint);
+	void HandleOnCompiled(UBlueprint* InBlueprint);
 
 	/**/
 	UPROPERTY()
@@ -513,9 +521,9 @@ public:
 	/* Event when misc stuff happens in the blueprint */
 	UPROPERTY(BlueprintAssignable)
 		FElgKEWOnChangeSignature OnGraphChanged;
-	void HandleOnChanged(class UBlueprint* InBlueprint);
+	void HandleOnChanged(UBlueprint* InBlueprint);
 
-	void HandleOnGraphChanged(const struct FEdGraphEditAction& InAction);
+	void HandleOnGraphChanged(const FEdGraphEditAction& InAction);
 
 	/* Event when the selected node(s) change in anyway, select/deselect */
 	UPROPERTY(BlueprintAssignable)

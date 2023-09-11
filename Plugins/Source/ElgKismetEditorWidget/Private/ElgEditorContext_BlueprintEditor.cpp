@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgEditorContext_BlueprintEditor.h"
@@ -10,12 +10,9 @@
 #include <Logging/TokenizedMessage.h>
 #include <BlueprintEditor.h>
 
-#include <Widgets/SWindow.h>
 #include <Framework/Application/SlateApplication.h>
-#include <Layout/WidgetPath.h>
 #include <SGraphPanel.h>
 #include <Kismet2/BlueprintEditorUtils.h>
-#include <Blueprint/WidgetLayoutLibrary.h>
 #include <Input/Events.h>
 #include <SKismetInspector.h>
 #include <K2Node_Variable.h>
@@ -25,8 +22,6 @@
 #include <ObjectEditorUtils.h>
 #include <Kismet2/KismetEditorUtilities.h>
 #include <K2Node_Event.h>
-#include <EdGraphSchema_K2_Actions.h>
-#include <K2Node_CallFunction.h>
 #include <ElgBESGraphVariableLocal.h>
 #include <ElgBESGraphVariable.h>
 #include <ElgBESGraphMacro.h>
@@ -40,8 +35,6 @@
 #include <ElgBESGraphVariableInherited.h>
 #include <Blueprint/WidgetTree.h>
 #include <ElgBESGraphWidget.h>
-#include <Components/NativeWidgetHost.h>
-#include <KismetWidgets/Public/SPinTypeSelector.h>
 #include <EdGraphSchema_K2.h>
 #include <Widgets/SWidget.h>
 #include <SGraphNode.h>
@@ -194,8 +187,7 @@ bool UElgEditorContext_BlueprintEditor::MyTick(float DeltaSeconds)
 	}
 	else if (SelectedNodeCount) {
 		TSet<UObject*> nodeDiff = SelectedNodeSet.Difference(selectedNodes);
-		int32 diffCount = nodeDiff.Num();
-		if (diffCount) {
+		if (nodeDiff.Num() > 0) {
 			HandleOnNodeSelectionChanged();
 		}
 	}
@@ -227,7 +219,7 @@ TArray<UElgBESGraphNode*> UElgEditorContext_BlueprintEditor::GetSelectedNodes()
 {
 	TArray<UElgBESGraphNode*> selectedGraphNodes;
 	TSet<UObject*> selectedNodes = BlueprintEditorPtr.Pin()->GetSelectedNodes();
-	if (selectedNodes.Num()) {
+	if (selectedNodes.Num() > 0) {
 		for (FGraphPanelSelectionSet::TConstIterator It(selectedNodes); It; ++It) {
 			if (UEdGraphNode* graphNode = Cast<UEdGraphNode>(*It)) {
 				selectedGraphNodes.Add(UElgBESGraphNode::MakeGraphNodeObject(graphNode));
@@ -329,7 +321,6 @@ void UElgEditorContext_BlueprintEditor::LogMessageToCompilerLog(const FText InMe
 		TArray<TSharedRef<FTokenizedMessage>> Messages;
 		EMessageSeverity::Type severity;
 		switch (InSeverity) {
-		case EBPElgKEWMessageSeverity::CriticalError:		severity = EMessageSeverity::CriticalError; break;
 		case EBPElgKEWMessageSeverity::Error:				severity = EMessageSeverity::Error; break;
 		case EBPElgKEWMessageSeverity::Info:				severity = EMessageSeverity::Info; break;
 		case EBPElgKEWMessageSeverity::PerformanceWarning:	severity = EMessageSeverity::PerformanceWarning; break;
@@ -609,8 +600,8 @@ void UElgEditorContext_BlueprintEditor::HandleDragAndDrop(const FPointerEvent& P
 	{
 		if (droppedOnVarNode && !PinUnderCursor) {
 			// we can only update GetNodes as you can not set input pin data.
-			if (UK2Node_VariableGet* getVarNnode = Cast<UK2Node_VariableGet>(droppedOnVarNode)) {
-				FElgKEWUtils::ChangeVariableNodeReferenceToPinVar(BlueprintPtr, GetFocusGraph(), getVarNnode, dragDropName);
+			if (UK2Node_VariableGet* getVarNode = Cast<UK2Node_VariableGet>(droppedOnVarNode)) {
+				FElgKEWUtils::ChangeVariableNodeReferenceToPinVar(BlueprintPtr, GetFocusGraph(), getVarNode, dragDropName);
 			}			
 		} else {			
 			FElgKEWUtils::SpawnPinVariableNodeInGraph(BlueprintPtr, GetFocusGraph(), dragDropName, nodePosition, PinUnderCursor);
@@ -636,7 +627,7 @@ void UElgEditorContext_BlueprintEditor::HandleDragAndDrop(const FPointerEvent& P
 	else if (dragDrop->IsA<UElgKEWDragDropWidgetVariable>())
 	{
 		if (droppedOnVarNode && !PinUnderCursor) {
-			if (UK2Node_VariableGet* getVarNnode = Cast<UK2Node_VariableGet>(droppedOnVarNode)) {
+			if (Cast<UK2Node_VariableGet>(droppedOnVarNode)) {
 				FElgKEWUtils::ChangeVariableNodeReferenceToMember(BlueprintPtr, droppedOnVarNode, dragDropName);
 			}
 		} else {
@@ -902,7 +893,6 @@ void UElgEditorContext_BlueprintEditor::GetOverridableFunctions(TArray<FS_ElgFun
 	UClass* ParentClass = BlueprintPtr->SkeletonGeneratedClass ? BlueprintPtr->SkeletonGeneratedClass->GetSuperClass() : *BlueprintPtr->ParentClass;
 	for (TFieldIterator<UFunction> FunctionIt(ParentClass, EFieldIteratorFlags::IncludeSuper); FunctionIt; ++FunctionIt) {
 		const UFunction* Function = *FunctionIt;
-		const FName FunctionName = Function->GetFName();
 		if (UEdGraphSchema_K2::CanKismetOverrideFunction(Function)
 			&& !FObjectEditorUtils::IsFunctionHiddenFromClass(Function, ParentClass)
 			&& !FBlueprintEditorUtils::FindOverrideForFunction(BlueprintPtr, CastChecked<UClass>(Function->GetOuter()), Function->GetFName()))
@@ -1055,8 +1045,8 @@ TArray<UElgBESGraphVariableInherited*> UElgEditorContext_BlueprintEditor::GetInh
 		FProperty* Property = *PropertyIt;
 
 		const bool bMulticastDelegateProp = Property->IsA(FMulticastDelegateProperty::StaticClass());
-		const bool bDelegateProp = (Property->IsA(FDelegateProperty::StaticClass()) || bMulticastDelegateProp);
-		const bool bShouldShowAsVar = (!Property->HasAnyPropertyFlags(CPF_Parm) && Property->HasAllPropertyFlags(CPF_BlueprintVisible)) && !bDelegateProp;
+		const bool bDelegateProp = Property->IsA(FDelegateProperty::StaticClass()) || bMulticastDelegateProp;
+		const bool bShouldShowAsVar = !Property->HasAnyPropertyFlags(CPF_Parm) && Property->HasAllPropertyFlags(CPF_BlueprintVisible) && !bDelegateProp;
 		if (!bShouldShowAsVar) continue;
 		if (localVars.Contains(Property->GetFName())) continue;
 		outVars.Add(UElgBESGraphVariableInherited::MakeGraphVariable(BlueprintPtr, Property));
@@ -1128,8 +1118,8 @@ TArray<UElgBESGraphWidgetVariable*> UElgEditorContext_BlueprintEditor::GetWidget
 		FProperty* Property = *PropertyIt;
 		
 		const bool bMulticastDelegateProp = Property->IsA(FMulticastDelegateProperty::StaticClass());
-		const bool bDelegateProp = (Property->IsA(FDelegateProperty::StaticClass()) || bMulticastDelegateProp);
-		const bool bShouldShowAsVar = (!Property->HasAnyPropertyFlags(CPF_Parm) && Property->HasAllPropertyFlags(CPF_BlueprintVisible)) && !bDelegateProp;
+		const bool bDelegateProp = Property->IsA(FDelegateProperty::StaticClass()) || bMulticastDelegateProp;
+		const bool bShouldShowAsVar = !Property->HasAnyPropertyFlags(CPF_Parm) && Property->HasAllPropertyFlags(CPF_BlueprintVisible) && !bDelegateProp;
 		
 		FObjectPropertyBase* Obj = CastField<FObjectPropertyBase>(Property);		
 		if (!bShouldShowAsVar || Obj == nullptr) continue; 
@@ -1206,7 +1196,6 @@ TArray<UElgBESGraphEventDispatcher*> UElgEditorContext_BlueprintEditor::GetEvent
 {
 	TArray<UElgBESGraphEventDispatcher*> out;
 	for (UEdGraph* delegateGraph : BlueprintPtr->DelegateSignatureGraphs) {
-		FName name = delegateGraph->GetFName();
 		out.Add(UElgBESGraphEventDispatcher::MakeGraphEventDispatcherObject(BlueprintPtr, delegateGraph));
 	}
 	return out;
@@ -1258,21 +1247,19 @@ TArray<FName> UElgEditorContext_BlueprintEditor::GetInterfaceNames()
 
 
 void UElgEditorContext_BlueprintEditor::AddInterface(const FName InterfaceClass)
-{	
-	if (UClass* InterfaceClassPtr = (UClass*)StaticFindObject(UClass::StaticClass(), ANY_PACKAGE, *InterfaceClass.ToString())) {
-		FBlueprintEditorUtils::ImplementNewInterface(BlueprintPtr, InterfaceClass);
+{
+	if (UClass* InterfaceClassPtr = UClass::TryFindTypeSlow<UClass>(InterfaceClass.ToString())) {
+		FBlueprintEditorUtils::ImplementNewInterface(BlueprintPtr, InterfaceClassPtr->GetClassPathName());
 	} else { // might be a BP that is not loaded yet so try to find the asset and load it before trying the interface again.
-		FName bpName = InterfaceClass;
 		FString tempName = InterfaceClass.ToString();
 		if (!tempName.EndsWith(TEXT("_C"))) {
 			tempName += TEXT("_C");
-			bpName = FName(*tempName);
 		}
 
 		FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 		IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
 		FARFilter Filter;
-		Filter.ClassNames.Add(UBlueprint::StaticClass()->GetFName());
+		Filter.ClassPaths.Add(UBlueprint::StaticClass()->GetClassPathName());
 		Filter.TagsAndValues.Add(FName(TEXT("BlueprintType")), FString(TEXT("BPTYPE_Interface")));
 		TArray<FAssetData> AssetList;
 		AssetRegistry.GetAssets(Filter, AssetList);
@@ -1285,8 +1272,7 @@ void UElgEditorContext_BlueprintEditor::AddInterface(const FName InterfaceClass)
 					const FString ClassObjectPath = FPackageName::ExportTextPathToObjectPath(*GeneratedClassPathPtr);
 					const FString ClassName = FPackageName::ObjectPathToObjectName(ClassObjectPath);
 					if (ClassName == tempName) {
-						Asset.GetAsset();
-						FBlueprintEditorUtils::ImplementNewInterface(BlueprintPtr, bpName);
+						FBlueprintEditorUtils::ImplementNewInterface(BlueprintPtr, Asset.AssetClassPath);
 					}
 				}
 			}
@@ -1298,10 +1284,8 @@ void UElgEditorContext_BlueprintEditor::AddInterface(const FName InterfaceClass)
 void UElgEditorContext_BlueprintEditor::RemoveInterface(const FName InterfaceClass, const bool InShowDialog /*= true*/)
 {
 	if (InterfaceClass.IsNone()) return;
-	FName className = InterfaceClass;
-	if (UElgBESGraphInterface* inter = GetInterfaceByName(InterfaceClass)) {
-		className = inter->InterfaceClassName;
-	}
+	UElgBESGraphInterface* inter = GetInterfaceByName(InterfaceClass);
+	if (!inter) return;
 
 	EAppReturnType::Type DialogReturn = EAppReturnType::No;
 	if (InShowDialog) {
@@ -1310,12 +1294,12 @@ void UElgEditorContext_BlueprintEditor::RemoveInterface(const FName InterfaceCla
 	}
 	
 	TArray<UEdGraph*> Graphs;
-	FBlueprintEditorUtils::GetInterfaceGraphs(BlueprintPtr, className, Graphs);
+	FBlueprintEditorUtils::GetInterfaceGraphs(BlueprintPtr, inter->InterfaceClassPtr->GetClassPathName(), Graphs);
 	for( TArray<UEdGraph*>::TIterator GraphIt(Graphs); GraphIt; ++GraphIt ) {
 		CloseTab(*GraphIt);
 	}
 
-	FBlueprintEditorUtils::RemoveInterface(BlueprintPtr, className, DialogReturn == EAppReturnType::Yes);
+	FBlueprintEditorUtils::RemoveInterface(BlueprintPtr, inter->InterfaceClassPtr->GetClassPathName(), DialogReturn == EAppReturnType::Yes);
 }
 
 void UElgEditorContext_BlueprintEditor::RemoveGraphByName(const FName InName)
@@ -1405,13 +1389,13 @@ UElgBESGraphUber* UElgEditorContext_BlueprintEditor::GetEventGraph()
 
 #pragma region Delegates
 
-void UElgEditorContext_BlueprintEditor::HandleOnCompiled(class UBlueprint* InBlueprint)
+void UElgEditorContext_BlueprintEditor::HandleOnCompiled(UBlueprint* InBlueprint)
 {
 	OnGraphCompiled.Broadcast();
 }
 
 
-void UElgEditorContext_BlueprintEditor::HandleOnChanged(class UBlueprint* InBlueprint)
+void UElgEditorContext_BlueprintEditor::HandleOnChanged(UBlueprint* InBlueprint)
 {
 	//UE_LOG(LogElgKismetEditorWidget, Log, TEXT("HandleOnChanged::"));
 	bOnGraphChanged = true;

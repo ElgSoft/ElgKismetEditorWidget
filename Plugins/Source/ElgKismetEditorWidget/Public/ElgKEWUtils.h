@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
@@ -37,7 +37,7 @@ public:
 
 	static bool DoFunctionHasFlag(UFunction* InFunction, EElgFunctionFlags InFlag);
 
-	static bool IsInvalid(UObject* InObject, const FString InMessage);
+	static bool IsInvalid(UObject* InObject, const FString& InMessage);
 
 	static UEdGraph* GetFunctionGraph(UBlueprint* InBlueprint, UFunction* InFunction);
 	static UEdGraph* GetMacroGraph(UBlueprint* InBlueprint, const FName InName);
@@ -113,8 +113,8 @@ public:
 	static TArray<TSharedRef<SWidget>> GetSlateWidgetsUnderMouse();
 	static FVector2D GetMousePosition();
 	static FVector2D GetMouseViewportPosition();
-	static FVector2D GetMousePositionInGraph(TSharedPtr<SGraphPanel> InGraphPanelWidget);
-	static bool IsWidgetSGraphPanel(TSharedPtr<SWidget> InWidget);
+	static FVector2D GetMousePositionInGraph(const TSharedPtr<SGraphPanel>& InGraphPanelWidget);
+	static bool IsWidgetSGraphPanel(const TSharedPtr<SWidget>& InWidget);
 
 	static UObject* GetEditorWidgetParent(UObject* InObject);
 
@@ -122,7 +122,7 @@ public:
 
 	/* Get the name of the class and function are used by the node */
 	static void GetCallFunctionMemberName(UEdGraphNode* InNode, FString& OutName, FString& OutParentClass,  FString& OutParentPath);
-	static FGuid GetCallfunctionMemberGuid(UEdGraphNode* InNode);
+	static FGuid GetCallFunctionMemberGuid(UEdGraphNode* InNode);
 
 
 	/* return the name of the EBPElgKEWPinCategory */
@@ -132,7 +132,7 @@ public:
 
 	/* Convert FEdGraphPinType to BP pin type */
 	static FS_ElgGraphPinType ConvertToPinType(FEdGraphPinType InPinType);
-	static FEdGraphPinType ConvertFromPinType(FS_ElgGraphPinType InPinType);
+	static FEdGraphPinType ConvertFromPinType(const FS_ElgGraphPinType& InPinType);
 	static EBPElgPinContainerType ConvertToPinContainerType(EPinContainerType InContainerType);
 	static EPinContainerType ConvertFromPinContainerType(EBPElgPinContainerType InContainerType);
 	static EBPElgEPinTypeFilter ConvertToPinTypeFilter(ETypeTreeFilter InPinFilter);
@@ -140,10 +140,10 @@ public:
 	static FS_ElgGraphPinType GetDefaultPinType();
 
 	static FString GetPropertyValueAsString(UBlueprint* InBlueprint, FProperty* InProperty);
-	static void SetPropertyValueAsString(UBlueprint* InBlueprint, FProperty* InProperty, FString InValue);
+	static void SetPropertyValueAsString(UBlueprint* InBlueprint, FProperty* InProperty, const FString& InValue);
 	//static FString GetPropertyValueAsString(UBlueprint* InBlueprint, FProperty* InProperty);
 
-	static void SetVariableCategory(UBlueprint* InBlueprint, const FName InVariableName, FText InNewCategory);
+	static void SetVariableCategory(UBlueprint* InBlueprint, const FName InVariableName, const FText& InNewCategory);
 	static void RemoveVariable(UBlueprint* InBlueprint, const FName InVariableName);
 
 	static FProperty* GetBlueprintProperty(UBlueprint* InBlueprint, const FName InName);
@@ -176,10 +176,10 @@ public:
 
 	
 
-	/* If you dont have a OldName pass in NAME_None */
+	/* If you don't have a OldName pass in NAME_None */
 	static bool NameValidator(UBlueprint* InBlueprint, const FName InOldName, const FName InNewName, FString& OutErrorMessage, UFunction* InFunction = NULL);
 	
-	static UFunction* GetLocalVaribleScope(UFunction* InFunction, const FName InName);
+	static UFunction* GetLocalVariableScope(UFunction* InFunction, const FName InName);
 	
 	/* Return the name of the new pin */
 	static FName AddEditablePin(UBlueprint* InBlueprint, UK2Node_EditablePinBase* InEntry, const FName InName, FS_ElgGraphPinType InType, const FString InDefaultValue, EEdGraphPinDirection InPinDirection);
@@ -195,7 +195,7 @@ public:
 
 	static FS_ElgFunctionInfo CreateFunctionInfo(const UFunction* InFunction);
 
-	static EBPElgKEWWFunctionType GetFuctionType(const UEdGraph* InFunctionGraph);
+	static EBPElgKEWWFunctionType GetFunctionType(const UEdGraph* InFunctionGraph);
 
 	static FName GetInterfaceClassName(const UClass* InClass);
 
@@ -205,7 +205,7 @@ public:
 	static bool IsNodeConnected(UEdGraphNode* InNode);
 
 	static FName DuplicateVariable(UBlueprint* InBlueprint, FProperty* InVariableProperty, const bool IsMember=true);
-	static UEdGraph* DuplcateGraph(UBlueprint* InBlueprint, UEdGraph* InGraph);
+	static UEdGraph* DuplicateGraph(UBlueprint* InBlueprint, UEdGraph* InGraph);
 
 	/* Update the the variable reference the node has. */
 	static void ChangeVariableNodeReference(UBlueprint* InBlueprint, UK2Node_Variable* InNodeToUpdate, const FName InNewVariableName, FEdGraphPinType InNewPinType, UStruct* InOwnerScope, const bool bIsInputPin=false);
@@ -213,7 +213,7 @@ public:
 	static void ChangeVariableNodeReferenceToLocal(UBlueprint* InBlueprint, UK2Node_Variable* InNodeToUpdate, UFunction* InFunction, const FName InVariableName);
 	static void ChangeVariableNodeReferenceToPinVar(UBlueprint* InBlueprint, UEdGraph* InFunctionGraph, UK2Node_VariableGet* InNodeToUpdate, const FName InVariableName);
 	/* Return any Pins that not are PinTypesCompatible withe the property type */
-	static void GetUnsupportedPinsForProperty(UK2Node_Variable* InNode, FEdGraphPinType InNewPinType, TArray<class UEdGraphPin*>& OutBroken);
+	static void GetUnsupportedPinsForProperty(UK2Node_Variable* InNode, const FEdGraphPinType& InNewPinType, TArray<UEdGraphPin*>& OutBroken);
 
 	/* Connect the node to the pin, if it can, and adjust the position of the node */
 	static void DropNodeOnPin(UK2Node* InNode, UEdGraphPin* InPin);

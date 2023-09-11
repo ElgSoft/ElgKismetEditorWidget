@@ -1,10 +1,8 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #include "BPWrappers/ElgBESGraphFunctionPin.h"
-#include <ElgKEWUtils.h>
 #include <K2Node_VariableGet.h>
 #include <K2Node_EditablePinBase.h>
-#include <Kismet2/BlueprintEditorUtils.h>
 #include <ElgKEWEditorSubSystem.h>
 
 

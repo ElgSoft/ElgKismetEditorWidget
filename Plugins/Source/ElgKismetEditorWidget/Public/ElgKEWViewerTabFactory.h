@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
@@ -6,10 +6,9 @@
 #include <WorkflowOrientedApp/WorkflowTabFactory.h>
 
 
-struct	FElgKEWViewerTabFactory : public FWorkflowTabFactory
+struct	FElgKEWViewerTabFactory : FWorkflowTabFactory
 {
-public:
-	FElgKEWViewerTabFactory(TSharedPtr<class FAssetEditorToolkit> InHostingApp);
+	FElgKEWViewerTabFactory(TSharedPtr<FAssetEditorToolkit> InHostingApp);
 
 	virtual TSharedRef<SWidget> CreateTabBody(const FWorkflowTabSpawnInfo& Info) const override;
 

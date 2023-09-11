@@ -1,14 +1,13 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "ElgKEWStructs.h"
-#include "ElgKEWEnum.h"
 #include "ElgKEWGraphNodeBP.generated.h"
 
 
+class UElgBESGraphNode;
 /**
  * 
  */

@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgBESGraphVariable.h"
@@ -103,7 +103,7 @@ void UElgBESGraphVariable::SetVariableReplicationCondition(ELifetimeCondition In
 
 void UElgBESGraphVariable::SetVariableRepNotifyFunc(const FName InFunc)
 {
-	if (FProperty* variableProperty = FindFProperty<FProperty>(BlueprintPtr->GeneratedClass, VariableName)) {
+	if (FindFProperty<FProperty>(BlueprintPtr->GeneratedClass, VariableName)) {
 		FBlueprintEditorUtils::SetBlueprintVariableRepNotifyFunc(BlueprintPtr, VariableName, InFunc);
 		uint64* PropFlagPtr = FBlueprintEditorUtils::GetBlueprintVariablePropertyFlags(BlueprintPtr, VariableName);
 		if (PropFlagPtr != NULL) {
@@ -126,30 +126,30 @@ void UElgBESGraphVariable::SetVariableReplicationType(const EBPElgVariableReplic
 	if (PropFlagPtr == NULL) return;
 
 	switch (InType) {
-	case EBPElgVariableReplication::None:
-		*PropFlagPtr &= ~CPF_Net;
-		SetVariableRepNotifyFunc(FName(NAME_None));
-		SetVariableReplicationCondition(ELifetimeCondition::COND_None);
-		break;
+		case EBPElgVariableReplication::None:
+			*PropFlagPtr &= ~CPF_Net;
+			SetVariableRepNotifyFunc(FName(NAME_None));
+			SetVariableReplicationCondition(COND_None);
+			break;
 
-	case EBPElgVariableReplication::Replicated:
-		*PropFlagPtr |= CPF_Net;
-		SetVariableRepNotifyFunc(FName(NAME_None));
-		break;
+		case EBPElgVariableReplication::Replicated:
+			*PropFlagPtr |= CPF_Net;
+			SetVariableRepNotifyFunc(FName(NAME_None));
+			break;
 
-	case EBPElgVariableReplication::RepNotify:
-		*PropFlagPtr |= CPF_Net;
-		FString NewFuncName = FString::Printf(TEXT("OnRep_%s"), *VariableName.ToString());
-		UEdGraph* FuncGraph = FindObject<UEdGraph>(BlueprintPtr, *NewFuncName);
-		if (!FuncGraph) {
-			FuncGraph = FBlueprintEditorUtils::CreateNewGraph(BlueprintPtr, FName(*NewFuncName), UEdGraph::StaticClass(), UEdGraphSchema_K2::StaticClass());
-			FBlueprintEditorUtils::AddFunctionGraph<UClass>(BlueprintPtr, FuncGraph, false, NULL);
-		}
+		case EBPElgVariableReplication::RepNotify:
+			*PropFlagPtr |= CPF_Net;
+			FString NewFuncName = FString::Printf(TEXT("OnRep_%s"), *VariableName.ToString());
+			UEdGraph* FuncGraph = FindObject<UEdGraph>(BlueprintPtr, *NewFuncName);
+			if (!FuncGraph) {
+				FuncGraph = FBlueprintEditorUtils::CreateNewGraph(BlueprintPtr, FName(*NewFuncName), UEdGraph::StaticClass(), UEdGraphSchema_K2::StaticClass());
+				FBlueprintEditorUtils::AddFunctionGraph<UClass>(BlueprintPtr, FuncGraph, false, NULL);
+			}
 
-		if (FuncGraph) {
-			SetVariableRepNotifyFunc(FName(*NewFuncName));
-		}
-		break;
+			if (FuncGraph) {
+				SetVariableRepNotifyFunc(FName(*NewFuncName));
+			}
+			break;
 	}
 	FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BlueprintPtr);
 }
@@ -341,7 +341,7 @@ FString UElgBESGraphVariable::GetVariableDeprecatedMessage()
 
 ELifetimeCondition UElgBESGraphVariable::GetVariableReplicationCondition()
 {
-	if (!ValidateAndUpdate()) return ELifetimeCondition::COND_None;
+	if (!ValidateAndUpdate()) return COND_None;
 	ELifetimeCondition repCondition = COND_None;
 	if (FProperty* variableProperty = FindFProperty<FProperty>(BlueprintPtr->GeneratedClass, VariableName)) {
 		repCondition = variableProperty->GetBlueprintReplicationCondition();
@@ -417,7 +417,7 @@ EBPElgBESVariableType UElgBESGraphVariable::GetVarType()
 FString UElgBESGraphVariable::GetDefaultValue()
 {
 	if (!ValidateAndUpdate()) return FString();
-	return GetDefaultValueFromPropterty();
+	return GetDefaultValueFromProperty();
 }
 
 bool UElgBESGraphVariable::ValidateAndUpdate()
@@ -444,7 +444,7 @@ bool UElgBESGraphVariable::ValidateAndUpdate()
 
 FString UElgBESGraphVariable::GetVarTipText()
 {
-	return GetVarPropteryTipText();
+	return GetVarPropertyTipText();
 }
 
 

@@ -1,10 +1,14 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
 #include "ElgBESBase.h"
+#include "ElgKEWEnum.h"
 #include "ElgBESGraphInterfaceFunction.generated.h"
 
+class UElgBESGraphFunctionPin;
+class UK2Node_FunctionEntry;
+class UK2Node_FunctionResult;
 /**
  * Blueprint wrapper for Interface functions.
  */

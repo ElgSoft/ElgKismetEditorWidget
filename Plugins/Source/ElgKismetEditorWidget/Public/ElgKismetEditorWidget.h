@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2019-2023 ElgSoft. All rights reserved.
 
 #pragma once
 
@@ -20,7 +20,7 @@ public:
 	/* Return the active BlueprintEditor or nullptr */
 	TWeakPtr<FBlueprintEditor> GetBlueprintEditor();
 
-	static inline FElgKismetEditorWidgetModule& Get()
+	static FElgKismetEditorWidgetModule& Get()
 	{
 		return FModuleManager::LoadModuleChecked<FElgKismetEditorWidgetModule>("ElgKismetEditorWidget");
 	}

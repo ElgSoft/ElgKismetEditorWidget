@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
@@ -17,9 +17,9 @@ public:
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs);
-	virtual ~SElgKEWViewerWidget();
+	virtual ~SElgKEWViewerWidget() override;
 
-	void HandleOnCompiled(class UBlueprint* InBlueprint);
+	void HandleOnCompiled(UBlueprint* InBlueprint);
 
 protected:
 	class UEditorUtilityWidget* editorWidget = nullptr;
@@ -27,12 +27,12 @@ protected:
 	/* Build the widget using the EditorWidget */
 	void MakeKismetEditorWidget();
 
-	TSharedRef<class SWidget> MakeWidgetPicker();
+	TSharedRef<SWidget> MakeWidgetPicker();
 
 	/*  */
-	TSharedPtr<class SComboButton> AssetPickerAnchor;
-	void OnAssetSelectedFromPicker(const struct FAssetData& InAssetData);
-	void OnAssetEnterPressedInPicker(const TArray<struct FAssetData>& InSelectedAssets);
+	TSharedPtr<SComboButton> AssetPickerAnchor;
+	void OnAssetSelectedFromPicker(const FAssetData& InAssetData);
+	void OnAssetEnterPressedInPicker(const TArray<FAssetData>& InSelectedAssets);
 
 	/*  */
 	FText OnGetComboTextValue() const;
@@ -46,9 +46,9 @@ protected:
 	FAssetData CurrentAssetData;
 
 	/** Border widget that wraps a dynamic context-sensitive widget for editing objects that the property window is displaying */
-	TSharedPtr<class SBorder> ContextualBorderWidget;
+	TSharedPtr<SBorder> ContextualBorderWidget;
 
-	TSharedPtr<class SVerticalBox> ContextualVerticalWidget;
+	TSharedPtr<SVerticalBox> ContextualVerticalWidget;
 
 	TWeakPtr<FBlueprintEditor> BlueprintEditorPtr;
 };

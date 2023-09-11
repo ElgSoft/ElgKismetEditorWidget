@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgBESGraphFunction.h"
@@ -12,7 +12,6 @@
 #include <K2Node_CallFunction.h>
 #include <K2Node_CreateDelegate.h>
 #include <GraphEditorSettings.h>
-#include <K2Node_FunctionTerminator.h>
 #include <K2Node_FunctionResult.h>
 #include <K2Node_FunctionEntry.h>
 #include "ObjectEditorUtils.h"
@@ -33,7 +32,7 @@ void UElgBESGraphFunction::SetIsPure(const bool bIsPure /*= true*/)
 	const FScopedTransaction Transaction(LOCTEXT("ChangePure", "Change Pure"));
 	EntryNodePtr->Modify();
 	func->Modify();
-	func->FunctionFlags ^= EFunctionFlags::FUNC_BlueprintPure;
+	func->FunctionFlags ^= FUNC_BlueprintPure;
 	EntryNodePtr->SetExtraFlags(EntryNodePtr->GetExtraFlags() ^ EFunctionFlags::FUNC_BlueprintPure);
 	FElgKEWUtils::UpdatedNodeParameters(EntryNodePtr);
 	FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(GetBlueprint());
@@ -53,11 +52,11 @@ void UElgBESGraphFunction::SetAccessSpecifier(EBPElgKEWFunctionAccess InAccessSp
 	int32 extraFlags = EntryNodePtr->GetExtraFlags();
 	extraFlags &= clearAccessSpecifierMask;
 
-	EFunctionFlags flag = EFunctionFlags::FUNC_Public;
+	EFunctionFlags flag = FUNC_Public;
 	switch (InAccessSpecifier) {
-	case EBPElgKEWFunctionAccess::Public:		flag = EFunctionFlags::FUNC_Public; break;
-	case EBPElgKEWFunctionAccess::Protected:	flag = EFunctionFlags::FUNC_Protected; break;
-	case EBPElgKEWFunctionAccess::Private:		flag = EFunctionFlags::FUNC_Private; break;
+	case EBPElgKEWFunctionAccess::Public:		flag = FUNC_Public; break;
+	case EBPElgKEWFunctionAccess::Protected:	flag = FUNC_Protected; break;
+	case EBPElgKEWFunctionAccess::Private:		flag = FUNC_Private; break;
 	}
 	extraFlags |= flag;
 	EntryNodePtr->SetExtraFlags(extraFlags);
@@ -222,7 +221,7 @@ void UElgBESGraphFunction::Remove(const bool bShowDialog /*= false*/)
 void UElgBESGraphFunction::Duplicate(UElgBESGraphFunction*& OutFunction)
 {
 	if (!ValidateFunction()) return;
-	if (UEdGraph* newGraph= FElgKEWUtils::DuplcateGraph(GetBlueprint(), GraphPtr)) {
+	if (UEdGraph* newGraph= FElgKEWUtils::DuplicateGraph(GetBlueprint(), GraphPtr)) {
 		OutFunction = UElgBESGraphFunction::MakeGraphFunctionObject(newGraph);
 		return;
 	}
@@ -503,7 +502,7 @@ bool UElgBESGraphFunction::GetIsOverride()
 {
 	if (!ValidateFunction()) return false; 
 	if (!GetBlueprint()->ParentClass) return false;
-	if (UFunction* overrideFunc = FindUField<UFunction>(GetBlueprint()->ParentClass, Name)) {
+	if (FindUField<UFunction>(GetBlueprint()->ParentClass, Name)) {
 		return true;
 	}
 	return false;
@@ -554,7 +553,7 @@ int32 UElgBESGraphFunction::GetCountInternal()
 		TArray<UK2Node_CallFunction*> callNodes;
 		graph->GetNodesOfClass(callNodes);
 		for (UK2Node_CallFunction* node : callNodes) {
-			if (FElgKEWUtils::GetCallfunctionMemberGuid(node) == Guid) {
+			if (FElgKEWUtils::GetCallFunctionMemberGuid(node) == Guid) {
 				usage++;
 			}
 		}
@@ -573,7 +572,7 @@ void UElgBESGraphFunction::GetIconInternal(struct FSlateBrush& OutBrush)
 {
 	if (!ValidateFunction()) return;
 
-	FLinearColor tint = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	FLinearColor tint;
 	if (GetIsPure()) {
 		tint = GetDefault<UGraphEditorSettings>()->PureFunctionCallNodeTitleColor;
 	} else {
@@ -582,11 +581,11 @@ void UElgBESGraphFunction::GetIconInternal(struct FSlateBrush& OutBrush)
 
 	if (UFunction* overrideFunc = FindUField<UFunction>(GetBlueprint()->ParentClass, Name)) {
 		const bool bIsPureFunction = overrideFunc && overrideFunc->HasAnyFunctionFlags(FUNC_BlueprintPure);
-		OutBrush = *FEditorStyle::GetBrush(bIsPureFunction ? TEXT("GraphEditor.OverridePureFunction_16x") : TEXT("GraphEditor.OverrideFunction_16x"));
+		OutBrush = *FAppStyle::GetBrush(bIsPureFunction ? TEXT("GraphEditor.OverridePureFunction_16x") : TEXT("GraphEditor.OverrideFunction_16x"));
 	}
 	else {
 		bool bIsPPure = GetIsPure();
-		OutBrush = *FEditorStyle::GetBrush(bIsPPure ? TEXT("GraphEditor.PureFunction_16x") : TEXT("GraphEditor.Function_16x"));
+		OutBrush = *FAppStyle::GetBrush(bIsPPure ? TEXT("GraphEditor.PureFunction_16x") : TEXT("GraphEditor.Function_16x"));
 	}
 	OutBrush.TintColor = tint;
 }

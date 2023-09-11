@@ -1,14 +1,13 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgKEWContainerWidget.h"
 
-#include <Widgets/Text/SRichTextBlock.h>
 #include <Widgets/SBoxPanel.h>
 #include <Engine/Blueprint.h>
-#include <Blutility/Classes/EditorUtilityWidget.h>
+#include <EditorUtilityWidget.h>
 #include <Editor.h>
-#include <BlueprintEditor.h>
+#include "Styling/AppStyle.h"
 
 #include <ElgKEWSettings.h>
 #include <ElgKEWEditorSubSystem.h>
@@ -32,7 +31,7 @@ void SElgKEWContainerWidget ::Construct(const FArguments& InArgs)
 		[
 			SAssignNew(BorderWidget, SBorder)
 			.Padding(0)
-			.BorderImage(FEditorStyle::GetBrush("NoBorder"))
+			.BorderImage(FAppStyle::GetBrush("NoBorder"))
 		]
 	];
 
@@ -44,11 +43,9 @@ void SElgKEWContainerWidget ::Construct(const FArguments& InArgs)
 void SElgKEWContainerWidget ::ConstructEditorWidget()
 {
 	FString errorMessage;
-	const FS_ElgKEWConfig* widgetInfo = nullptr;	
 	if (widgetInfoIdentifier.IsValid()) {
-		FName widgetKey;
 		if (widgetInfoIdentifier.Get()) {
-			widgetKey = *widgetInfoIdentifier;
+			FName widgetKey = *widgetInfoIdentifier;
 			if (widgetKey.IsValid()) {
 				WidgetInfo = GetDefault<UElgKEWSettings>()->Widgets.Find(*widgetInfoIdentifier.Get());
 			}
@@ -88,7 +85,7 @@ void SElgKEWContainerWidget ::ConstructEditorWidget()
 	TSharedRef<SBorder> content =
 		SNew(SBorder)
 		.Padding(5)
-		.BorderImage(FEditorStyle::GetBrush("NoBorder"))
+		.BorderImage(FAppStyle::GetBrush("NoBorder"))
 		.VAlign(VAlign_Center)
 		.HAlign(HAlign_Center);
 
@@ -116,11 +113,9 @@ void SElgKEWContainerWidget ::HandleOnCompiled(UBlueprint* InBlueprint)
 
 SElgKEWContainerWidget ::~SElgKEWContainerWidget ()
 {
-	UBlueprint* blueprint = nullptr;
 	if (WidgetInfo) {
 		if (UObject* obj = WidgetInfo->EditorWidget.TryLoad()) {
-			blueprint = Cast<UBlueprint>(obj);
-			if (blueprint) {
+			if (UBlueprint* blueprint = Cast<UBlueprint>(obj)) {
 				blueprint->OnCompiled().RemoveAll(this);
 			}
 		}

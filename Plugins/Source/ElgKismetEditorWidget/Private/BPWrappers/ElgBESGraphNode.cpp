@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgBESGraphNode.h"
@@ -19,7 +19,7 @@ void UElgBESGraphNode::GetNodeInputPins(TArray<UElgBESGraphPin*>& OutPins)
 {
 	if (!ValidateNode()) return;
 	for (UEdGraphPin* pin : NodePtr->Pins) {
-		if (pin->Direction == EEdGraphPinDirection::EGPD_Input) {
+		if (pin->Direction == EGPD_Input) {
 			if (!pin->bHidden && pin->PinType.PinCategory != UEdGraphSchema_K2::PC_Exec) {
 				OutPins.Add(UElgBESGraphPin::MakeGraphPinObject(pin));
 			}			
@@ -31,7 +31,7 @@ void UElgBESGraphNode::GetNodeOutputPins(TArray<UElgBESGraphPin*>& OutPins)
 {
 	if (!ValidateNode()) return;
 	for (UEdGraphPin* pin : NodePtr->Pins) {
-		if (pin->Direction == EEdGraphPinDirection::EGPD_Output) {
+		if (pin->Direction == EGPD_Output) {
 			if (!pin->bHidden && pin->PinType.PinCategory != UEdGraphSchema_K2::PC_Exec) {
 				OutPins.Add(UElgBESGraphPin::MakeGraphPinObject(pin));
 			}
@@ -114,7 +114,7 @@ FString UElgBESGraphNode::GetNodeTipText()
 
 UEdGraph* UElgBESGraphNode::GetGraph()
 {
-	if (!ValidateNode()) nullptr;
+	if (!ValidateNode()) return nullptr;
 	return NodePtr->GetGraph();
 }
 

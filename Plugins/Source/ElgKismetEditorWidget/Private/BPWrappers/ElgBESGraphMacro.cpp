@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgBESGraphMacro.h"
@@ -100,7 +100,7 @@ UElgBESGraphMacroPin* UElgBESGraphMacro::AddInputPin(FS_ElgGraphPinType InType, 
 		InPinName = FName(TEXT("newparam"));
 	}
 	UElgBESGraphMacroPin* newPin = nullptr;
-	InPinName = FElgKEWUtils::AddEditablePin(GetBlueprint(), InputNodePtr, InPinName, InType, InDefaultValue, EEdGraphPinDirection::EGPD_Output);
+	InPinName = FElgKEWUtils::AddEditablePin(GetBlueprint(), InputNodePtr, InPinName, InType, InDefaultValue, EGPD_Output);
 	GetMacroInputPinVariable(InPinName, newPin);
 	return newPin;
 }
@@ -112,7 +112,7 @@ UElgBESGraphMacroPin* UElgBESGraphMacro::AddOutputPin(FS_ElgGraphPinType InType,
 		InPinName = FName(TEXT("newparam"));
 	}
 	UElgBESGraphMacroPin* newPin = nullptr;
-	InPinName = FElgKEWUtils::AddEditablePin(GetBlueprint(), OutputNodePtr, InPinName, InType, FString(), EEdGraphPinDirection::EGPD_Input);
+	InPinName = FElgKEWUtils::AddEditablePin(GetBlueprint(), OutputNodePtr, InPinName, InType, FString(), EGPD_Input);
 	GetMacroOutputPinVariable(InPinName, newPin);
 	return newPin;
 }
@@ -190,7 +190,7 @@ void UElgBESGraphMacro::SetMacroName(FName InNewName)
 void UElgBESGraphMacro::Duplicate(UElgBESGraphMacro*& OutMacro)
 {
 	if (!ValidateMacro()) return;
-	if (UEdGraph* newGraph = FElgKEWUtils::DuplcateGraph(GetBlueprint(), GraphPtr)) {
+	if (UEdGraph* newGraph = FElgKEWUtils::DuplicateGraph(GetBlueprint(), GraphPtr)) {
 		OutMacro = UElgBESGraphMacro::MakeGraphMacroObject(newGraph);
 		return;
 	}

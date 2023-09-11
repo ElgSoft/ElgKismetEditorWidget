@@ -1,10 +1,9 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "EditorSubsystem.h"
-#include <EditorUtilityWidget.h>
 #include <BlueprintEditor.h>
 #include "ElgEditorContext_BlueprintEditor.h"
 #include "ElgKEWEditorSubSystem.generated.h"
@@ -30,12 +29,12 @@ public:
 
 #pragma endregion
 
-	TMap<UObject*, class TWeakPtr<FBlueprintEditor>> WidgetBPEditorMap;
+	TMap<UObject*, TWeakPtr<FBlueprintEditor>> WidgetBPEditorMap;
 	
 	UPROPERTY()
 		TMap<UBlueprint*, UElgEditorContext_BlueprintEditor*> EditorWidgetContextMap;
 
-	/* return and create a context for an KismetEditorWidgt BlueprintEditor */
+	/* return and create a context for an KismetEditorWidget BlueprintEditor */
 	UElgEditorContext_BlueprintEditor* GetContext(UObject* InSelf);
 
 	/* one KismetEditorWidget has been closed so we need to clean up anything that use it */

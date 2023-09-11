@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #include "BPWrappers/ElgBESGraphVariableBase.h"
 #include <ElgKEWUtils.h>
@@ -6,7 +6,6 @@
 #include <ElgEditorContext_BlueprintEditor.h>
 #include <Kismet2/BlueprintEditorUtils.h>
 #include <K2Node_Variable.h>
-#include <ObjectEditorUtils.h>
 #include "ElgKEW_Log.h"
 
 
@@ -97,12 +96,12 @@ void UElgBESGraphVariableBase::GetIconFromProperty(FSlateBrush& OutBrush)
 	OutBrush.TintColor = iconColorOut;
 }
 
-FString UElgBESGraphVariableBase::GetVarPropteryTipText()
+FString UElgBESGraphVariableBase::GetVarPropertyTipText()
 {
 	return PropertyPtr->GetToolTipText().ToString();
 }
 
-FString UElgBESGraphVariableBase::GetDefaultValueFromPropterty()
+FString UElgBESGraphVariableBase::GetDefaultValueFromProperty()
 {
 	if (FProperty* variableProperty = FindFProperty<FProperty>(BlueprintPtr->GeneratedClass, VariableName)) {
 		DefaultValue = FElgKEWUtils::GetPropertyValueAsString(BlueprintPtr, variableProperty);

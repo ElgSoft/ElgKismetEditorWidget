@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #include "ElgBESGraphInterfaceFunction.h"
 #include <ElgKEWUtils.h>
@@ -6,14 +6,11 @@
 #include <ElgEditorContext_BlueprintEditor.h>
 #include <Kismet2/KismetEditorUtilities.h>
 #include <Kismet2/BlueprintEditorUtils.h>
-#include <K2Node_FunctionResult.h>
-#include <K2Node_FunctionEntry.h>
-#include <K2Node_CreateDelegate.h>
 #include <K2Node_CallFunction.h>
-#include <GraphEditorSettings.h>
 #include "ObjectEditorUtils.h"
 #include <K2Node_Event.h>
 #include "ElgKEW_Log.h"
+#include "K2Node_FunctionEntry.h"
 
 
 #define LOCTEXT_NAMESPACE "FElgKismetEditorWidgetModule"
@@ -52,10 +49,8 @@ bool UElgBESGraphInterfaceFunction::ImpletentEvent()
 	if (UK2Node_Event* ExistingNode = FBlueprintEditorUtils::FindOverrideForFunction(BlueprintPtr, OverrideFuncClass, FunctionName)) {
 		FKismetEditorUtilities::BringKismetToFocusAttentionOnObject(ExistingNode, false);
 		return false;
-	} else {
-		return FElgKEWUtils::SpawnEventNodeInGraph(BlueprintPtr, FunctionName);
 	}
-	return true;
+	return FElgKEWUtils::SpawnEventNodeInGraph(BlueprintPtr, FunctionName);
 }
 
 
@@ -335,7 +330,7 @@ void UElgBESGraphInterfaceFunction::GetIconInternal(struct FSlateBrush& OutBrush
 	if (!bFunction) {
 		tint = FLinearColor::Yellow;
 	}
-	OutBrush = *FEditorStyle::GetBrush(TEXT("GraphEditor.InterfaceFunction_16x"));
+	OutBrush = *FAppStyle::GetBrush(TEXT("GraphEditor.InterfaceFunction_16x"));
 	OutBrush.TintColor = tint;
 
 }

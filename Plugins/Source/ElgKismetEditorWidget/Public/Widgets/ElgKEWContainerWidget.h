@@ -1,9 +1,8 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Widgets/SWidget.h"
 #include "Widgets/SCompoundWidget.h"
 
 class FBlueprintEditor;
@@ -21,18 +20,18 @@ public:
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs);
-	virtual ~SElgKEWContainerWidget ();
+	virtual ~SElgKEWContainerWidget () override;
 	void ConstructEditorWidget();
 
-	void HandleOnCompiled(class UBlueprint* InBlueprint);
+	void HandleOnCompiled(UBlueprint* InBlueprint);
 
 protected:
 	class UEditorUtilityWidget* editorWidget = nullptr;
 
 	TSharedPtr<FName> widgetInfoIdentifier;
-	const struct FS_ElgKEWConfig* WidgetInfo;
+	const struct FS_ElgKEWConfig* WidgetInfo = nullptr;
 
 	TWeakPtr<FBlueprintEditor> BlueprintEditorPtr;
 
-	TSharedPtr<class SBorder> BorderWidget;	
+	TSharedPtr<SBorder> BorderWidget;	
 };

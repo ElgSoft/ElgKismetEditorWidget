@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
@@ -6,6 +6,7 @@
 #include "BPWrappers/ElgBESGraphVariableBase.h"
 #include "ElgBESGraphWidgetVariable.generated.h"
 
+class UWidget;
 /**
  * Widget Variable
  */
@@ -16,9 +17,9 @@ class ELGKISMETEDITORWIDGET_API UElgBESGraphWidgetVariable : public UElgBESGraph
 
 public:
 
-	class UWidget* WidgetPtr;
+	UWidget* WidgetPtr;
 
-	class UWidget* GetWidget();
+	UWidget* GetWidget();
 
 	virtual int32 GetVarReferenceCount() override;
 	virtual EBPElgBESVariableType GetVarType() override;

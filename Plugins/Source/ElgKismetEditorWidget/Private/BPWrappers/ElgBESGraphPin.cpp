@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "BPWrappers/ElgBESGraphPin.h"
@@ -152,7 +152,7 @@ TArray<UElgBESGraphPin*> UElgBESGraphPin::GetPinLinkedTo()
 	if (!BlueprintPtr) return pins;
 	
 	for (UEdGraphPin* pin : GetPin()->LinkedTo) {		
-		pins.Add(UElgBESGraphPin::MakeGraphPinObject(pin));
+		pins.Add(MakeGraphPinObject(pin));
 	}
 	return pins;
 }
@@ -282,8 +282,9 @@ bool UElgBESGraphPin::GetPinDefaultValueIsIgnored()
 
 bool UElgBESGraphPin::GetPinbIsDiffing()
 {
+	//#fixme: remove or update this to use SGraphPanel::DiffResults or something.
 	if (UEdGraphPin* pin = GetPin()) {
-		return pin->bIsDiffing;
+		return false;
 	}
 	return false;
 }
@@ -306,7 +307,7 @@ bool UElgBESGraphPin::GetPinAllowFriendlyName()
 
 FText UElgBESGraphPin::GetPinPinFriendlyName()
 {
-	if (UEdGraphPin* pin = GetPin()) {
+	if (GetPin()) {
 		return GetPin()->PinFriendlyName;
 	}
 	return FText();	
@@ -316,7 +317,7 @@ FText UElgBESGraphPin::GetPinPinFriendlyName()
 bool UElgBESGraphPin::GetIsValid()
 {
 	if (NodePtr && PinId.IsValid()) {
-		if (UEdGraphPin* pin = NodePtr->FindPinById(PinId)) {
+		if (NodePtr->FindPinById(PinId)) {
 			return true;
 		}
 	}
@@ -343,7 +344,7 @@ class UEdGraphPin* UElgBESGraphPin::GetPin()
 	if (PinName.IsValid()) {
 		message = PinName.ToString();
 	}
-	UE_LOG(LogElgKismetEditorWidget, Warning, TEXT("Pin [%s] is no longer valid!"));
+	UE_LOG(LogElgKismetEditorWidget, Warning, TEXT("Pin [%s] is no longer valid!"), *message);
 	return nullptr;
 }
 

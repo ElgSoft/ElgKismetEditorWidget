@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgKEWBlueprintEditorBP.h"
@@ -52,14 +52,13 @@ EBPElgKEWGraphType UElgKEWBlueprintEditorBP::GetGraphType(UEdGraph* InGraph)
 {
 	if (InGraph) {
 		if (const UEdGraphSchema* schema = InGraph->GetSchema()) {
-			EGraphType graphType = schema->GetGraphType(InGraph);
-			switch (graphType) {
-			case EGraphType::GT_Ubergraph:		return EBPElgKEWGraphType::GT_Ubergraph;
-			case EGraphType::GT_Animation:		return EBPElgKEWGraphType::GT_Animation;
-			case EGraphType::GT_Function:		return EBPElgKEWGraphType::GT_Function;
-			case EGraphType::GT_Macro:			return EBPElgKEWGraphType::GT_Macro;
-			case EGraphType::GT_StateMachine:	return EBPElgKEWGraphType::GT_StateMachine;
-			default:							return EBPElgKEWGraphType::GT_Function;
+			switch (schema->GetGraphType(InGraph)) {
+				case 		GT_Ubergraph:		return EBPElgKEWGraphType::GT_Ubergraph;
+				case 		GT_Animation:		return EBPElgKEWGraphType::GT_Animation;
+				case 		GT_Function:		return EBPElgKEWGraphType::GT_Function;
+				case 		GT_Macro:			return EBPElgKEWGraphType::GT_Macro;
+				case 		GT_StateMachine:	return EBPElgKEWGraphType::GT_StateMachine;
+				default:						return EBPElgKEWGraphType::GT_Function;
 			}
 		}
 	}
@@ -93,8 +92,7 @@ void UElgKEWBlueprintEditorBP::MakePinType(EBPElgKEWPinCategory InType, EBPElgPi
 void UElgKEWBlueprintEditorBP::TestFindBlueprintEditor(UObject* InSelf)
 {
 	if (GEditor) {
-		IAssetEditorInstance* AssetEditor = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->FindEditorForAsset(InSelf->GetClass()->ClassGeneratedBy, false);
-		if (AssetEditor) {
+		if (IAssetEditorInstance* AssetEditor = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->FindEditorForAsset(InSelf->GetClass()->ClassGeneratedBy, false)) {
 			FBlueprintEditor* BlueprintEditor = static_cast<FBlueprintEditor*>(AssetEditor);
 			UE_LOG(LogElgKismetEditorWidget, Log, TEXT("Found it!"));
 			GetKismetContext(InSelf);

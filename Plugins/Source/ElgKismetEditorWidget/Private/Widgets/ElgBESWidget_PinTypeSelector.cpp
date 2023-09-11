@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "Widgets/ElgBESWidget_PinTypeSelector.h"
@@ -12,10 +12,10 @@
 UElgBESWidget_PinTypeSelector::UElgBESWidget_PinTypeSelector(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	UObject* blueprintWidget = GetOutermostObject();
-	FName bpName = blueprintWidget->GetFName();
 	SPinTypeSelector::FArguments Defaults;
 	VariablePinType = FElgKEWUtils::GetDefaultPinType();
+	PinTypeFilter = EBPElgEPinTypeFilter::None;
+	
 }
 
 

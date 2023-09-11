@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "BPWrappers/ElgBESGraphVariableLocal.h"
@@ -20,7 +20,7 @@ void UElgBESGraphVariableLocal::RemoveVariable(const bool bShowDialog/* = false*
 		if (DialogReturn == EAppReturnType::No) return;
 	}
 
-	if (UFunction* varScope = FElgKEWUtils::GetLocalVaribleScope(FunctionPtr, VariableName)) {
+	if (UFunction* varScope = FElgKEWUtils::GetLocalVariableScope(FunctionPtr, VariableName)) {
 		const FScopedTransaction Transaction(LOCTEXT("RemoveLocalVariable", "Remove Local Variable"));
 		BlueprintPtr->Modify();
 		EntryNodePtr->Modify();

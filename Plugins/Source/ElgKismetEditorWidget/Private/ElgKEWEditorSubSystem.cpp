@@ -1,10 +1,8 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgKEWEditorSubSystem.h"
-#include <ElgKismetEditorWidget.h>
 #include <BlueprintEditor.h>
-#include <EditorUtilityWidgetBlueprint.h>
 #include <ElgEditorContext_BlueprintEditor.h>
 
 
@@ -32,8 +30,7 @@ UElgEditorContext_BlueprintEditor* UElgKEWEditorSubSystem::GetContext(UObject* I
 	UBlueprint* bp = editor.Pin()->GetBlueprintObj();
 
 	// need to check if there already are an editor for the object
-	UElgEditorContext_BlueprintEditor* context = FindEditorContext(bp);
-	if (context) {
+	if (UElgEditorContext_BlueprintEditor* context = FindEditorContext(bp)) {
 		// the editor might have been destroyed so make sure it's valid
 		// no need to create a new object just update it.
 		context->UpdateBlueprintEditor(editor);
@@ -57,8 +54,7 @@ void UElgKEWEditorSubSystem::ContainerWidgetDestroyed(UBlueprint* Blueprint)
 
 UElgEditorContext_BlueprintEditor* UElgKEWEditorSubSystem::FindEditorContext(UBlueprint* Blueprint)
 {
-	auto* context = EditorWidgetContextMap.Find(Blueprint);
-	if (context) {
+	if (auto* context = EditorWidgetContextMap.Find(Blueprint)) {
 		return *context;
 	}
 	return nullptr;

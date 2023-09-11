@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2019-2023 ElgSoft. All rights reserved.
 
 #include "ElgKismetEditorWidget.h"
 #include <BlueprintEditorModule.h>

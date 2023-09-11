@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "BPWrappers/ElgBESGraphUber.h"
@@ -6,12 +6,12 @@
 #include <ElgEditorContext_BlueprintEditor.h>
 #include <Kismet2/BlueprintEditorUtils.h>
 #include <K2Node_CreateDelegate.h>
-#include <Kismet2/KismetEditorUtilities.h>
 #include <ElgKEWUtils.h>
 #include <ElgBESGraphNode.h>
 #include <EdGraph/EdGraphNode.h>
 #include <K2Node_Event.h>
 #include "ElgKEW_Log.h"
+#include "Styling/AppStyle.h"
 
 
 #define LOCTEXT_NAMESPACE "FElgKismetEditorWidgetModule"
@@ -152,7 +152,7 @@ FName UElgBESGraphUber::GetNameInternal()
 void UElgBESGraphUber::GetIconInternal(struct FSlateBrush& OutBrush)
 {
 	FLinearColor tint = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	OutBrush = *FEditorStyle::GetBrush(TEXT("GraphEditor.EventGraph_16x"));
+	OutBrush = *FAppStyle::GetBrush(TEXT("GraphEditor.EventGraph_16x"));
 	OutBrush.TintColor = tint;
 }
 

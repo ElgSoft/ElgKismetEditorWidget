@@ -1,9 +1,8 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "ElgKEWEnum.h"
 #include "ElgKEWStructs.h"
 #include "ElgBESGraphPin.generated.h"
@@ -23,9 +22,9 @@ public:
 	UPROPERTY()
 		FGuid PinId;
 
-	class UEdGraphNode* NodePtr;
-	class UBlueprint* BlueprintPtr;
-	class UEdGraph* GraphPtr;
+	UEdGraphNode* NodePtr;
+	UBlueprint* BlueprintPtr;
+	UEdGraph* GraphPtr;
 
 	void Setup(UEdGraphPin* InPin);
 
@@ -148,8 +147,8 @@ public:
 
 #pragma endregion
 
-	class UEdGraphPin* GetPin();
-	bool Validate();
+	UEdGraphPin* GetPin();
+	bool Validate() { return true; };
 
 
 	static UElgBESGraphPin* MakeGraphPinObject(UEdGraphPin* InPin);

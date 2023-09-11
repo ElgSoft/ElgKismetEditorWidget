@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
@@ -20,9 +20,6 @@ class ELGKISMETEDITORWIDGET_API UElgBESWidget_PinTypeSelector : public UWidget
 public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnElgBESPinTypeSelectorChanged, FS_ElgGraphPinType, InPinType);
 
-
-public:
-
 	/* Filter what pin types the Selector should list */
 	UPROPERTY(EditAnywhere, Category = Content)
 		EBPElgEPinTypeFilter PinTypeFilter;
@@ -34,8 +31,6 @@ public:
 	/** Called when the pin is changed interactively by the user */
 	UPROPERTY(BlueprintAssignable, Category = "Widget|PinTypeSelector|Events")
 		FOnElgBESPinTypeSelectorChanged OnPinTypeChanged;
-
-public:
 
 	//~ Begin UWidget Interface
 	virtual void SynchronizeProperties() override;
@@ -64,11 +59,10 @@ protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	// End of UWidget
 
-	FEdGraphPinType HandleOnGetVarType()  const;;
+	FEdGraphPinType HandleOnGetVarType()  const;
 	void HandleOnVarTypeChanged(const FEdGraphPinType& NewPinType);
 
-
-protected:
+	
 	TSharedPtr<SPinTypeSelector> MyPinTypeSelector;
 
 	//PROPERTY_BINDING_IMPLEMENTATION(FName, VariableName);

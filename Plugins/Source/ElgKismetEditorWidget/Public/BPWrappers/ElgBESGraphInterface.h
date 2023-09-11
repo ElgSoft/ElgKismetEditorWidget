@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
@@ -6,6 +6,7 @@
 #include "ElgBESBase.h"
 #include "ElgBESGraphInterface.generated.h"
 
+class UElgBESGraphInterfaceFunction;
 /**
  * Blueprint wrapper for an interface a Blueprint can implement.
  */

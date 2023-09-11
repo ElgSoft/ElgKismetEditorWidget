@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
@@ -41,7 +41,7 @@ public:
 		FString DefaultValue;
 
 	/** Type of the variable */
-	struct FEdGraphPinType VarType;
+	FEdGraphPinType VarType;
 	FBPVariableDescription VariableDescription;
 	UBlueprint* BlueprintPtr;
 	FProperty* PropertyPtr;
@@ -90,8 +90,8 @@ public:
 
 
 	void GetIconFromProperty(FSlateBrush& OutBrush);
-	FString GetVarPropteryTipText();
-	FString GetDefaultValueFromPropterty();
+	FString GetVarPropertyTipText();
+	FString GetDefaultValueFromProperty();
 	FS_ElgGraphPinType GetPinTypeFromProperty();
 	
 
@@ -112,7 +112,7 @@ public:
 	virtual FText GetToolTipInternal() override;
 	virtual FText GetCategoryInternal() override;
 	virtual int32 GetCountInternal() override;
-	virtual void GetIconInternal(struct FSlateBrush& OutBrush) override;
+	virtual void GetIconInternal(FSlateBrush& OutBrush) override;
 
 	
 	void UpdateVariableDescription(FBPVariableDescription InVariableDescription);

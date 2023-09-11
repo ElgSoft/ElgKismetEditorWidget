@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgKEWViewerWidget.h"
@@ -9,7 +9,10 @@
 #include <Widgets/Layout/SScrollBox.h>
 #include <IContentBrowserSingleton.h>
 #include <ElgKEWEditorSubSystem.h>
+
+#include "EditorUtilityWidgetBlueprint.h"
 #include "ElgKEW_Log.h"
+#include "Styling/AppStyle.h"
 
 
 void SElgKEWViewerWidget::Construct(const FArguments& InArgs)
@@ -26,7 +29,7 @@ void SElgKEWViewerWidget::Construct(const FArguments& InArgs)
 		.AutoHeight()
 		[
 			SAssignNew(AssetPickerAnchor, SComboButton)
-			.ButtonStyle(FEditorStyle::Get(), "PropertyEditor.AssetComboStyle")
+			.ButtonStyle(FAppStyle::Get(), "PropertyEditor.AssetComboStyle")
 			.OnGetMenuContent(this, &SElgKEWViewerWidget::MakeWidgetPicker)
 			.ForegroundColor(this, &SElgKEWViewerWidget::OnGetComboForeground)
 			.ContentPadding(FMargin(2, 2, 2, 1))
@@ -37,8 +40,8 @@ void SElgKEWViewerWidget::Construct(const FArguments& InArgs)
 			[
 				SNew(STextBlock)
 				.ColorAndOpacity(this, &SElgKEWViewerWidget::OnGetComboForeground)
-				.TextStyle(FEditorStyle::Get(), "PropertyEditor.AssetClass")
-				.Font(FEditorStyle::GetFontStyle("PropertyWindow.NormalFont"))
+				.TextStyle(FAppStyle::Get(), "PropertyEditor.AssetClass")
+				.Font(FAppStyle::GetFontStyle("PropertyWindow.NormalFont"))
 				.Text(this, &SElgKEWViewerWidget::OnGetComboTextValue)
 			]			
 		]
@@ -49,7 +52,7 @@ void SElgKEWViewerWidget::Construct(const FArguments& InArgs)
 		[
 			SAssignNew(ContextualBorderWidget, SBorder)
 			.Padding(0)
-			.BorderImage(FEditorStyle::GetBrush("NoBorder"))
+			.BorderImage(FAppStyle::GetBrush("NoBorder"))
 			]
 		];
 }
@@ -107,12 +110,10 @@ void SElgKEWViewerWidget::MakeKismetEditorWidget()
 TSharedRef<class SWidget> SElgKEWViewerWidget::MakeWidgetPicker()
 {
 	FContentBrowserModule& ContentBrowserModule = FModuleManager::Get().LoadModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser"));
-	// Can't access EditorUtilityWidgetBlueprint::StaticClass() so we just use the name 
-	FName className = FName("EditorUtilityWidgetBlueprint");
 
 	// Configure filter for asset picker
 	FAssetPickerConfig AssetPickerConfig;
-	AssetPickerConfig.Filter.ClassNames.Add(className);
+	AssetPickerConfig.Filter.ClassPaths.Add(UEditorUtilityWidgetBlueprint::StaticClass()->GetClassPathName());
 	AssetPickerConfig.Filter.bRecursiveClasses = true;
 	AssetPickerConfig.bAllowNullSelection = true;
 	AssetPickerConfig.OnAssetSelected = FOnAssetSelected::CreateSP(this, &SElgKEWViewerWidget::OnAssetSelectedFromPicker);
@@ -126,7 +127,7 @@ TSharedRef<class SWidget> SElgKEWViewerWidget::MakeWidgetPicker()
 		.WidthOverride(300)
 		[
 			SNew(SBorder)
-			.BorderImage(FEditorStyle::GetBrush("Menu.Background"))
+			.BorderImage(FAppStyle::GetBrush("Menu.Background"))
 			[
 				ContentBrowserModule.Get().CreateAssetPicker(AssetPickerConfig)
 			]

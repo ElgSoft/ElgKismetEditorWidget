@@ -1,10 +1,7 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgKEWGraphNodeBP.h"
-#include "ElgKEWStructs.h"
-#include <ElgKEWEnum.h>
-#include <Kismet2/KismetEditorUtilities.h>
 #include <Math/Color.h>
 #include <Textures/SlateIcon.h>
 #include <K2Node_Variable.h>

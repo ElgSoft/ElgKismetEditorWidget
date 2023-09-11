@@ -1,13 +1,10 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgKEWVariableBP.h"
 #include "ElgKEWStructs.h"
 #include "ElgKEWEnum.h"
-#include <ElgEditorContext_BlueprintEditor.h>
-#include <ElgKEWEditorSubSystem.h>
-#include <ElgKEWUtils.h>
-
+#include "Styling/AppStyle.h"
 #include <ElgBESGraphVariable.h>
 
 
@@ -105,9 +102,9 @@ FText UElgKEWVariableBP::GetVariableExposedTipText(const bool bExposedState)
 void UElgKEWVariableBP::GetVariableExposedIcon(const bool bExposedState, FSlateBrush& OutBrush)
 {
 	if (bExposedState) {
-		OutBrush = *FEditorStyle::GetBrush("Kismet.VariableList.ExposeForInstance");
+		OutBrush = *FAppStyle::GetBrush("Kismet.VariableList.ExposeForInstance");
 	} else {
-		OutBrush = *FEditorStyle::GetBrush("Kismet.VariableList.HideForInstance");
+		OutBrush = *FAppStyle::GetBrush("Kismet.VariableList.HideForInstance");
 	}
 }
 

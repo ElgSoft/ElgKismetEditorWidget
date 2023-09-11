@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
@@ -7,6 +7,8 @@
 #include "ElgBESBase.h"
 #include "ElgBESGraphFunction.generated.h"
 
+class UElgBESGraphFunctionPin;
+class UElgBESGraphVariableLocal;
 class UEdGraph;
 class UK2Node_FunctionEntry;
 class UK2Node_FunctionResult;

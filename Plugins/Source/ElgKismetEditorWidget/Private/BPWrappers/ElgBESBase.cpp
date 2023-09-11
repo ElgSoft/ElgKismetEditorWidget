@@ -1,10 +1,12 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved.
 
 
 #include "BPWrappers/ElgBESBase.h"
 #include <Styling/SlateBrush.h>
 #include <ElgEditorContext_BlueprintEditor.h>
 #include <ElgKEWEditorSubSystem.h>
+#include "Styling/AppStyle.h"
+
 
 void UElgBESBase::ShowInDetails()
 {
@@ -111,6 +113,6 @@ int32 UElgBESBase::GetCountInternal()
 void UElgBESBase::GetIconInternal(struct FSlateBrush& OutBrush)
 {
 	FLinearColor tint = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	OutBrush = *FEditorStyle::GetBrush(TEXT("GraphEditor.PureFunction_16x"));
+	OutBrush = *FAppStyle::GetBrush(TEXT("GraphEditor.PureFunction_16x"));
 	OutBrush.TintColor = tint;
 }

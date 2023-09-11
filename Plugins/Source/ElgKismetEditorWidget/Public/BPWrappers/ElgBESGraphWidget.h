@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
@@ -11,7 +11,7 @@ class UElgBESGraphWidgetVariable;
 
 
 /**
- * Blueprintable representation for a Widget in the WidgetTree
+ * Blueprintable representation of a Widget in the WidgetTree
  */
 UCLASS(Blueprintable) 
 class ELGKISMETEDITORWIDGET_API UElgBESGraphWidget : public UElgBESBase
@@ -46,7 +46,7 @@ public:
 
 
 	virtual FName GetNameInternal() override;
-	virtual void GetIconInternal(struct FSlateBrush& OutBrush) override;
+	virtual void GetIconInternal(FSlateBrush& OutBrush) override;
 	virtual FText GetToolTipInternal() override;
 
 

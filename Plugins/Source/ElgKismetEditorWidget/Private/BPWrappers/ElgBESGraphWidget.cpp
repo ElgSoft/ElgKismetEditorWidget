@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "BPWrappers/ElgBESGraphWidget.h"
@@ -19,8 +19,7 @@ void UElgBESGraphWidget::SetIsVariable(const bool bIsVariable, const bool bShowD
 	if (WidgetPtr->bIsVariable && bShowDialog) {
 		if (UElgBESGraphWidgetVariable* variable = GetWidgetVariable()) {
 			if (variable->IsInUse()) {
-				EAppReturnType::Type DialogReturn = EAppReturnType::No;
-				DialogReturn = FMessageDialog::Open(EAppMsgType::YesNoCancel, NSLOCTEXT("UnrealEd", "WidgetVariable", "The variable is referenced in the blueprint graph, are you sure you want hide/remove it?"));
+				EAppReturnType::Type DialogReturn = FMessageDialog::Open(EAppMsgType::YesNoCancel, NSLOCTEXT("UnrealEd", "WidgetVariable", "The variable is referenced in the blueprint graph, are you sure you want hide/remove it?"));
 				if (DialogReturn == EAppReturnType::Cancel || DialogReturn == EAppReturnType::No) return;
 			}
 		}	

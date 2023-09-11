@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgBESGraphEditablePinBase.h"
@@ -145,7 +145,7 @@ void UElgBESGraphEditablePinBase::Setup(UBlueprint* InBlueprint, UEdGraph* InGra
 	NodePtr = InNode;
 	PinPtr = InPin;
 	bCanAddExecPins = false;
-	bInputPin = PinPtr->Direction == EEdGraphPinDirection::EGPD_Output ? true : false;
+	bInputPin = PinPtr->Direction == EGPD_Output ? true : false;
 	Direction = bInputPin ? EBPElgKEWPinDirection::Input : EBPElgKEWPinDirection::Output;
 	SetupCustom();
 	UpdatePinProperties();

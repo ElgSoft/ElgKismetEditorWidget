@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "BPWrappers/ElgBESGraphEventDispatcher.h"
@@ -102,7 +102,7 @@ UElgBESGraphEventDispatcherPin* UElgBESGraphEventDispatcher::AddInputPin(FS_ElgG
 		InPinName = FName(TEXT("newparam"));
 	}
 	UElgBESGraphEventDispatcherPin* newPin = nullptr;
-	InPinName = FElgKEWUtils::AddEditablePin(BlueprintPtr, NodePtr, InPinName, InType, InDefaultValue, EEdGraphPinDirection::EGPD_Output);
+	InPinName = FElgKEWUtils::AddEditablePin(BlueprintPtr, NodePtr, InPinName, InType, InDefaultValue, EGPD_Output);
 	GetInputPinVariable(InPinName, newPin);
 	return newPin;
 }

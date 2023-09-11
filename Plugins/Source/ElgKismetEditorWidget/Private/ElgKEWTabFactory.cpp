@@ -1,11 +1,11 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #include "ElgKEWTabFactory.h"
 
 #include <WorkflowOrientedApp/WorkflowTabManager.h>
 #include <BlueprintEditor.h>
 #include <Toolkits/AssetEditorToolkit.h>
-#include <EditorStyleSet.h>
+#include "Styling/AppStyle.h"
 
 #include <ElgKEWSettings.h>
 #include <ElgKEWContainerWidget.h>
@@ -20,7 +20,7 @@ FElgKEWTabFactory::FElgKEWTabFactory( TSharedPtr<class FAssetEditorToolkit> InHo
 {
 	TabIdentifier = InIdentifier;
 	TabLabel = InWidgetInfo.TabLabel;
-	TabIcon = FSlateIcon(FEditorStyle::GetStyleSetName(), "Icons.Warning");
+	TabIcon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icons.Warning");
 	bIsSingleton = true;
 	ViewMenuDescription = InWidgetInfo.MenuDescription;
 	ViewMenuTooltip = InWidgetInfo.MenuToolTip;

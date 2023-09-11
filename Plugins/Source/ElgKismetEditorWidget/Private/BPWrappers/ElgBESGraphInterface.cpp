@@ -1,13 +1,9 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "BPWrappers/ElgBESGraphInterface.h"
 #include <ElgKEWUtils.h>
-#include <ElgBESGraphFunction.h>
 #include <ElgBESGraphInterfaceFunction.h>
-#include <ClassViewerModule.h>
-#include <ClassViewerFilter.h>
-#include <Kismet2/KismetEditorUtilities.h>
 #include <AssetRegistry/AssetRegistryModule.h>
 #include <ElgKEWBlueprintInterfaceFilter.h>
 #include "ElgKEW_Log.h"
@@ -142,7 +138,7 @@ TArray<UElgBESGraphInterface*> UElgBESGraphInterface::GetBlueprintInterfaces(UBl
 	check(InBlueprint);
 	for (int32 i = 0; i < InBlueprint->ImplementedInterfaces.Num(); i++) {
 		FBPInterfaceDescription& InterfaceDesc = InBlueprint->ImplementedInterfaces[i];
-		interfaces.Add(UElgBESGraphInterface::MakeGraphInterface(InBlueprint, InterfaceDesc));
+		interfaces.Add(MakeGraphInterface(InBlueprint, InterfaceDesc));
 	}
 	if (bIncludeInherent) {
 		// Now get all the ones the blueprint's parents implemented
@@ -193,7 +189,7 @@ TArray<FName> UElgBESGraphInterface::GetInterfaces(UBlueprint* InBlueprint)
 	IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
 
 	FARFilter Filter;	
-	Filter.ClassNames.Add(UBlueprint::StaticClass()->GetFName());
+	Filter.ClassPaths.Add(UBlueprint::StaticClass()->GetClassPathName());
 	Filter.bRecursiveClasses = true;
 	Filter.TagsAndValues.Add(FName(TEXT("BlueprintType")), FString(TEXT("BPTYPE_Interface")));
 

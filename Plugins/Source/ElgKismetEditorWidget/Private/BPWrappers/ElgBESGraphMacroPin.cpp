@@ -1,9 +1,8 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "BPWrappers/ElgBESGraphMacroPin.h"
 #include <ElgKEWUtils.h>
-#include <K2Node_VariableGet.h>
 
 #define LOCTEXT_NAMESPACE "FElgKismetEditorWidgetModule"
 

@@ -1,12 +1,8 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgKEWGraphPinBP.h"
 #include <ElgKEWStructs.h>
-#include <ElgKEWUtils.h>
-#include <Kismet2/KismetEditorUtilities.h>
-#include <EdGraphSchema_K2.h>
-#include <Kismet/KismetSystemLibrary.h>
 #include <ElgBESGraphPin.h>
 
 

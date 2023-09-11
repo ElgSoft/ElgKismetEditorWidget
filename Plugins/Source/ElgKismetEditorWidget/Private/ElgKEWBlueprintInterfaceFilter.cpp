@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgKEWBlueprintInterfaceFilter.h"
@@ -47,8 +47,7 @@ bool FElgKEWBlueprintInterfaceFilter::IsClassAllowed(const FAssetData& InAssetDa
 {
 	FAssetDataTagMapSharedView::FFindTagResult ResultType = InAssetData.TagsAndValues.FindTag(TEXT("BlueprintType"));
 	if (ResultType.IsSet()) {
-		const FString& bpType = ResultType.GetValue();
-		if (!bpType.Equals(TEXT("BPTYPE_Interface"))) return false ;
+		if (!ResultType.GetValue().Equals(TEXT("BPTYPE_Interface"))) return false ;
 		if (ClassNames.Contains(InAssetData.AssetName)) return false;
 		return true;
 	}
@@ -81,8 +80,7 @@ void FElgKEWBlueprintInterfaceFilter::Setup()
 			for (int32 exclusionIndex = 0; exclusionIndex < prohibitedInterfaceNames.Num(); ++exclusionIndex) {
 				prohibitedInterfaceNames[exclusionIndex].TrimStartInline();
 				FString const& prohibitedInterfaceName = prohibitedInterfaceNames[exclusionIndex].RightChop(1);
-				UClass* prohibitedInterface = (UClass*)StaticFindObject(UClass::StaticClass(), ANY_PACKAGE, *prohibitedInterfaceName);
-				if (prohibitedInterface) {
+				if (UClass* prohibitedInterface = UClass::TryFindTypeSlow<UClass>(prohibitedInterfaceName)) {
 					ClassToFilterOut.Add(prohibitedInterface);
 				}
 			}

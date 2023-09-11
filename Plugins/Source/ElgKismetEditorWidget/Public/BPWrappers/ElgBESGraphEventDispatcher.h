@@ -1,18 +1,18 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "ElgBESGraphVariableBase.h"
 #include "ElgBESGraphEventDispatcher.generated.h"
 
+class UElgBESGraphEventDispatcherPin;
 class UEdGraph;
 class UFunction;
 class UK2Node_FunctionEntry;
 
 /**
- * Blueprint wrapper for EventDispacther in a Graph.
+ * Blueprint wrapper for EventDispatcher in a Graph.
  */
 UCLASS(Blueprintable)
 class ELGKISMETEDITORWIDGET_API UElgBESGraphEventDispatcher : public UElgBESGraphVariableBase

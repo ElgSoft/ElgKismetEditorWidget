@@ -1,11 +1,9 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgKEWViewerTabFactory.h"
-
-
 #include <WorkflowOrientedApp/WorkflowTabManager.h>
-#include <EditorStyleSet.h>
+#include "Styling/AppStyle.h"
 #include <ElgKEWViewerWidget.h>
 #include <Toolkits/AssetEditorToolkit.h>
 #include <BlueprintEditor.h>
@@ -17,7 +15,7 @@ FElgKEWViewerTabFactory::FElgKEWViewerTabFactory(TSharedPtr<class FAssetEditorTo
 	FWorkflowTabFactory(TEXT("EditorWidgetViewer"), InHostingApp)
 {
 	TabLabel = LOCTEXT("TabTitle", "EditorWidgetViewer");
-	TabIcon = FSlateIcon(FEditorStyle::GetStyleSetName(), "Kismet.Tabs.Palette");
+	TabIcon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "Kismet.Tabs.Palette");
 	bIsSingleton = true;
 	ViewMenuDescription = LOCTEXT("ViewMenuDescription", "EditorWidgetViewer");
 	ViewMenuTooltip = LOCTEXT("ViewMenuToolTip", "Show any Editor Widget.");

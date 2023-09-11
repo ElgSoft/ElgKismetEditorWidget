@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 
@@ -13,7 +13,5 @@ UCLASS()
 class ELGKISMETEDITORWIDGET_API UElgKEWGraphFunctionBP : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-
-public:
 
 };

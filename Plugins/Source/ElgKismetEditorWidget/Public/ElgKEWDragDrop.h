@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 #pragma once
 		
@@ -20,9 +20,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category="KEWDragDrop", meta = (ExposeOnSpawn = "true"))
 		FName NameOfDragDropObject;
 
-	void DragCancelled_Implementation(const FPointerEvent& PointerEvent);
+	virtual void DragCancelled_Implementation(const FPointerEvent& PointerEvent) override;
 
-	void Dragged_Implementation(const FPointerEvent& PointerEvent);
+	virtual void Dragged_Implementation(const FPointerEvent& PointerEvent) override;
 };
 
 

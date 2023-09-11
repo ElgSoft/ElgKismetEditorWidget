@@ -1,4 +1,4 @@
-// Copyright 2019-2021 ElgSoft. All rights reserved. 
+// Copyright 2019-2023 ElgSoft. All rights reserved. 
 
 
 #include "ElgKEWUtils.h"
@@ -17,7 +17,6 @@
 #include <K2Node_VariableGet.h>
 #include <EdGraphSchema_K2_Actions.h>
 #include <K2Node_FunctionResult.h>
-#include <BPWrappers/ElgBESGraphPin.h>
 #include <ElgBESGraphVariableLocal.h>
 #include <K2Node_MacroInstance.h>
 #include <K2Node_CallDelegate.h>
@@ -28,9 +27,9 @@
 #include <WidgetBlueprint.h>
 #include <Blueprint/WidgetTree.h>
 #include <K2Node_AddComponent.h>
-#include <Classes/EditorStyleSettings.h>
 #include <K2Node_VariableSet.h>
 #include "ElgKEW_Log.h"
+#include "Settings/EditorStyleSettings.h"
 
 
 #define LOCTEXT_NAMESPACE "FElgKismetEditorWidgetModule"
@@ -113,7 +112,7 @@ bool FElgKEWUtils::DoFunctionHasFlag(UFunction* InFunction, EElgFunctionFlags In
 }
 
 
-bool FElgKEWUtils::IsInvalid(UObject* InObject, const FString InMessage)
+bool FElgKEWUtils::IsInvalid(UObject* InObject, const FString& InMessage)
 {
 	if (!IsValid(InObject)) {
 		UE_LOG(LogElgKismetEditorWidget, Warning, TEXT("%s: Invalid object"), *InMessage)
@@ -197,8 +196,6 @@ bool FElgKEWUtils::SpawnFunctionNodeInGraph(UBlueprint* InBlueprint, UEdGraph* I
 {
 	if (!InBlueprint || !InGraph || !InFunctionName.IsValid()) return false;
 
-	UBlueprintFunctionNodeSpawner* functionNodeSpawner;
-
 	// do we need this???
 	FGraphActionListBuilderBase tempListBuilder;
 	tempListBuilder.OwnerOfTemporaries = NewObject<UEdGraph>(InBlueprint);
@@ -209,12 +206,12 @@ bool FElgKEWUtils::SpawnFunctionNodeInGraph(UBlueprint* InBlueprint, UEdGraph* I
 		UE_LOG(LogElgKismetEditorWidget, Warning, TEXT("Failed to find any function named [%s] in [%s]" ), *InFunctionName.ToString(), *InBlueprint->GetName())
 		return false;
 	}
-	if (!functionToSpawn->HasAnyFunctionFlags((FUNC_BlueprintCallable | FUNC_BlueprintPure))) {
+	if (!functionToSpawn->HasAnyFunctionFlags(FUNC_BlueprintCallable | FUNC_BlueprintPure)) {
 		UE_LOG(LogElgKismetEditorWidget, Warning, TEXT("Function [%s] in [%s] is not Callable or Pure"), *InFunctionName.ToString(), *InBlueprint->GetName())
 		return false;
 	}
 
-	functionNodeSpawner = UBlueprintFunctionNodeSpawner::Create(functionToSpawn);
+	UBlueprintFunctionNodeSpawner* functionNodeSpawner = UBlueprintFunctionNodeSpawner::Create(functionToSpawn);
 
 	const FScopedTransaction Transaction(LOCTEXT("AddedFunction", "Function added to Graph"));
 
@@ -258,8 +255,7 @@ bool FElgKEWUtils::SpawnVariableNodeInGraph(UBlueprint* InBlueprint, UEdGraph* I
 {
 	if (FProperty* variableProperty = FindFProperty<FProperty>(InBlueprint->SkeletonGeneratedClass, InVariableName)) {
 		UStruct* Outer = variableProperty->GetOwnerChecked<UStruct>();
-		const UEdGraphSchema_K2* K2_Schema = Cast<const UEdGraphSchema_K2>(InGraph->GetSchema());
-		if (K2_Schema) {
+		if (const UEdGraphSchema_K2* K2_Schema = Cast<const UEdGraphSchema_K2>(InGraph->GetSchema())) {
 
 			if (InPin && !CanDropPropertyOnPin(variableProperty, InPin)) return false;
 
@@ -293,9 +289,8 @@ bool FElgKEWUtils::SpawnLocalVariableNodeInGraph(UBlueprint* InBlueprint, UEdGra
 	if (!IsGraphAFunction(InGraph)) return false;
 
 	if (UFunction* func = FindFunctionInBlueprint(InBlueprint, InGraph->GetFName())) {
-		if (UFunction* Outer = GetLocalVaribleScope(func, InVariableName))  {
-			const UEdGraphSchema_K2* K2_Schema = Cast<const UEdGraphSchema_K2>(InGraph->GetSchema());
-			if (K2_Schema) {
+		if (UFunction* Outer = GetLocalVariableScope(func, InVariableName))  {
+			if (const UEdGraphSchema_K2* K2_Schema = Cast<const UEdGraphSchema_K2>(InGraph->GetSchema())) {
 
 				// override what type of node to spawn if it's dropped on a Pin
 				if (InPin) {
@@ -344,8 +339,7 @@ bool FElgKEWUtils::SpawnPinVariableNodeInGraph(UBlueprint* InBlueprint, UEdGraph
 
 	if (UFunction* func = FindFunctionInBlueprint(InBlueprint, InGraph->GetFName())) {
 		if (UStruct* owningScope = Cast<UStruct>(func)) {
-			const UEdGraphSchema_K2* K2_Schema = Cast<const UEdGraphSchema_K2>(InGraph->GetSchema());
-			if (K2_Schema) {
+			if (const UEdGraphSchema_K2* K2_Schema = Cast<const UEdGraphSchema_K2>(InGraph->GetSchema())) {
 				if (InPin) {
 					FProperty* variableProperty = GetFunctionProperty(func, InVariableName);
 					if (!CanDropPropertyOnPin(variableProperty, InPin)) return false;
@@ -379,8 +373,9 @@ bool FElgKEWUtils::SpawnEventDispatcherNodeInGraph(UBlueprint* InBlueprint, UEdG
 	const UBlueprint* DropOnBlueprint = FBlueprintEditorUtils::FindBlueprintForGraph(InGraph);
 	bool bSelfContext = VariableSourceClass == NULL || DropOnBlueprint->SkeletonGeneratedClass->IsChildOf(VariableSourceClass);
 
+	UK2Node* resultNode;
 	if (bInCall) {
-		UK2Node* resultNode = FEdGraphSchemaAction_K2NewNode::SpawnNode<UK2Node_CallDelegate>(
+		resultNode = FEdGraphSchemaAction_K2NewNode::SpawnNode<UK2Node_CallDelegate>(
 			InGraph,
 			InNodePosition,
 			EK2NewNodeFlags::SelectNewNode,
@@ -389,13 +384,9 @@ bool FElgKEWUtils::SpawnEventDispatcherNodeInGraph(UBlueprint* InBlueprint, UEdG
 				NewInstance->SetFromProperty(propertyDelegate, bSelfContext, propertyDelegate->GetOwnerClass());
 			}
 		);
-
-		if (InPin) {
-			FElgKEWUtils::DropNodeOnPin(resultNode, InPin);
-		}
-		return true;
-	} else {		
-		UK2Node* resultNode = FEdGraphSchemaAction_K2NewNode::SpawnNode<UK2Node_AddDelegate>(
+		
+	} else {
+		resultNode = FEdGraphSchemaAction_K2NewNode::SpawnNode<UK2Node_AddDelegate>(
 			InGraph,
 			InNodePosition,
 			EK2NewNodeFlags::SelectNewNode,
@@ -403,13 +394,13 @@ bool FElgKEWUtils::SpawnEventDispatcherNodeInGraph(UBlueprint* InBlueprint, UEdG
 			{
 				NewInstance->SetFromProperty(propertyDelegate, bSelfContext, propertyDelegate->GetOwnerClass());
 			}
-		);
-		if (InPin) {
-			FElgKEWUtils::DropNodeOnPin(resultNode, InPin);
-		}
-		return true;
+			);
 	}
-	return false;
+	if (resultNode && InPin) {
+		DropNodeOnPin(resultNode, InPin);
+	}
+		
+	return (resultNode ? true : false);
 }
 
 
@@ -501,14 +492,14 @@ FVector2D FElgKEWUtils::GetMouseViewportPosition()
 }
 
 
-FVector2D FElgKEWUtils::GetMousePositionInGraph(TSharedPtr<SGraphPanel> InGraphPanelWidget)
+FVector2D FElgKEWUtils::GetMousePositionInGraph(const TSharedPtr<SGraphPanel>& InGraphPanelWidget)
 {
 	const FGeometry& testGeo = InGraphPanelWidget->GetTickSpaceGeometry();
 	const FVector2D nodePosition = InGraphPanelWidget->PanelCoordToGraphCoord(testGeo.AbsoluteToLocal(FElgKEWUtils::GetMouseViewportPosition()));	
 	return nodePosition;
 }
 
-bool FElgKEWUtils::IsWidgetSGraphPanel(TSharedPtr<SWidget> InWidget)
+bool FElgKEWUtils::IsWidgetSGraphPanel(const TSharedPtr<SWidget>& InWidget)
 {
 	if (InWidget->GetType() == FName("SGraphPanel")) return true;
 	return false;
@@ -523,10 +514,8 @@ UObject* FElgKEWUtils::GetEditorWidgetParent(UObject* InObject)
 	if (outer == nullptr) return outer;
 	if (outer->IsA(UEditorUtilityWidget::StaticClass())) {
 		return outer;
-	} else {
-		outer = GetEditorWidgetParent(outer);
-	}
-	return outer;
+	}		
+	return GetEditorWidgetParent(outer);
 }
 
 
@@ -543,16 +532,15 @@ void FElgKEWUtils::GetNodeMemberName(UEdGraphNode* InNode, FString& OutName, FSt
 
 void FElgKEWUtils::GetCallFunctionMemberName(UEdGraphNode* InNode, FString& OutName, FString& OutParentClass, FString& OutParentPath)
 {	
-	if (UK2Node_CallFunction* nodeType = Cast<UK2Node_CallFunction>(InNode)) {
+	if (Cast<UK2Node_CallFunction>(InNode)) {
 		for (TFieldIterator<FProperty> It(InNode->GetClass(), EFieldIteratorFlags::IncludeSuper); It; ++It) {
 			FProperty* currentProperty = *It;
 			FName propertyName = currentProperty->GetFName();
 			if (propertyName == "FunctionReference") {
 				if (FStructProperty* structProperty = CastField<FStructProperty>(currentProperty)) {					
 					FMemberReference* theStructValue = structProperty->ContainerPtrToValuePtr<FMemberReference>(InNode);
-					UClass* parentClass = theStructValue->GetMemberParentClass();
 
-					if (parentClass) {
+					if (theStructValue->GetMemberParentClass()) {
 						OutName = theStructValue->GetMemberName().ToString();
 						OutParentClass = theStructValue->GetMemberParentClass()->GetName();
 						OutParentPath = theStructValue->GetMemberParentClass()->GetPathName();
@@ -567,9 +555,9 @@ void FElgKEWUtils::GetCallFunctionMemberName(UEdGraphNode* InNode, FString& OutN
 }
 
 
-FGuid FElgKEWUtils::GetCallfunctionMemberGuid(UEdGraphNode* InNode)
+FGuid FElgKEWUtils::GetCallFunctionMemberGuid(UEdGraphNode* InNode)
 {
-	if (UK2Node_CallFunction* nodeType = Cast<UK2Node_CallFunction>(InNode)) {
+	if (Cast<UK2Node_CallFunction>(InNode)) {
 		for (TFieldIterator<FProperty> It(InNode->GetClass(), EFieldIteratorFlags::IncludeSuper); It; ++It) {
 			FProperty* currentProperty = *It;
 			FName propertyName = currentProperty->GetFName();
@@ -623,49 +611,71 @@ EBPElgKEWPinCategory FElgKEWUtils::NameToPinCategoryEnum(FName InPinCategory)
 	
 	if (InPinCategory == FName(TEXT("exec"))) {
 		return EBPElgKEWPinCategory::PC_Exec;
-	} else if (InPinCategory == FName(TEXT("bool"))) {
+	}
+	if (InPinCategory == FName(TEXT("bool"))) {
 		return EBPElgKEWPinCategory::PC_Boolean;
-	} else if (InPinCategory == FName(TEXT("byte"))) {
+	}
+	if (InPinCategory == FName(TEXT("byte"))) {
 		return EBPElgKEWPinCategory::PC_Byte;
-	} else if (InPinCategory == FName(TEXT("class"))) {
+	}
+	if (InPinCategory == FName(TEXT("class"))) {
 		return EBPElgKEWPinCategory::PC_Class;
-	} else if (InPinCategory == FName(TEXT("softclass"))) {
+	}
+	if (InPinCategory == FName(TEXT("softclass"))) {
 		return EBPElgKEWPinCategory::PC_SoftClass;
-	} else if (InPinCategory == FName(TEXT("int"))) {
+	}
+	if (InPinCategory == FName(TEXT("int"))) {
 		return EBPElgKEWPinCategory::PC_Int;
-	} else if (InPinCategory == FName(TEXT("int64"))) {
+	}
+	if (InPinCategory == FName(TEXT("int64"))) {
 		return EBPElgKEWPinCategory::PC_Int64;
-	} else if (InPinCategory == FName(TEXT("float"))) {
+	}
+	if (InPinCategory == FName(TEXT("float"))) {
 		return EBPElgKEWPinCategory::PC_Float;
-	} else if (InPinCategory == FName(TEXT("name"))) {
+	}
+	if (InPinCategory == FName(TEXT("name"))) {
 		return EBPElgKEWPinCategory::PC_Name;
-	} else if (InPinCategory == FName(TEXT("delegate"))) {
+	}
+	if (InPinCategory == FName(TEXT("delegate"))) {
 		return EBPElgKEWPinCategory::PC_Delegate;
-	} else if (InPinCategory == FName(TEXT("mcdelegate"))) {
+	}
+	if (InPinCategory == FName(TEXT("mcdelegate"))) {
 		return EBPElgKEWPinCategory::PC_MCDelegate;
-	} else if (InPinCategory == FName(TEXT("object"))) {
+	}
+	if (InPinCategory == FName(TEXT("object"))) {
 		return EBPElgKEWPinCategory::PC_Object;
-	} else if (InPinCategory == FName(TEXT("interface"))) {
+	}
+	if (InPinCategory == FName(TEXT("interface"))) {
 		return EBPElgKEWPinCategory::PC_Interface;
-	} else if (InPinCategory == FName(TEXT("softobject"))) {
+	}
+	if (InPinCategory == FName(TEXT("softobject"))) {
 		return EBPElgKEWPinCategory::PC_SoftObject;
-	} else if (InPinCategory == FName(TEXT("string"))) {
+	}
+	if (InPinCategory == FName(TEXT("string"))) {
 		return EBPElgKEWPinCategory::PC_String;
-	} else if (InPinCategory == FName(TEXT("text"))) {
+	}
+	if (InPinCategory == FName(TEXT("text"))) {
 		return EBPElgKEWPinCategory::PC_Text;
-	} else if (InPinCategory == FName(TEXT("struct"))) {
+	}
+	if (InPinCategory == FName(TEXT("struct"))) {
 		return EBPElgKEWPinCategory::PC_Struct;
-	} else if (InPinCategory == FName(TEXT("wildcard"))) {
+	}
+	if (InPinCategory == FName(TEXT("wildcard"))) {
 		return EBPElgKEWPinCategory::PC_Wildcard;
-	} else if (InPinCategory == FName(TEXT("enum"))) {
+	}
+	if (InPinCategory == FName(TEXT("enum"))) {
 		return EBPElgKEWPinCategory::PC_Enum;
-	} else if (InPinCategory == FName(TEXT("fieldpath"))) {
+	}
+	if (InPinCategory == FName(TEXT("fieldpath"))) {
 		return EBPElgKEWPinCategory::PC_FieldPath;
-	} else if (InPinCategory == FName(TEXT("self"))) {
+	}
+	if (InPinCategory == FName(TEXT("self"))) {
 		return EBPElgKEWPinCategory::PSC_Self;
-	} else if (InPinCategory == FName(TEXT("index"))) {
+	}
+	if (InPinCategory == FName(TEXT("index"))) {
 		return EBPElgKEWPinCategory::PSC_Index;
-	} else if (InPinCategory == FName(TEXT("bitmask"))) {
+	}
+	if (InPinCategory == FName(TEXT("bitmask"))) {
 		return EBPElgKEWPinCategory::PSC_Bitmask;
 	}
 	return EBPElgKEWPinCategory::PC_Exec;
@@ -696,7 +706,7 @@ FS_ElgGraphPinType FElgKEWUtils::ConvertToPinType(FEdGraphPinType InPinType)
 }
 
 
-FEdGraphPinType FElgKEWUtils::ConvertFromPinType(FS_ElgGraphPinType InPinType)
+FEdGraphPinType FElgKEWUtils::ConvertFromPinType(const FS_ElgGraphPinType& InPinType)
 {
 	return InPinType.EdGraphPinType;
 }
@@ -766,12 +776,12 @@ FString FElgKEWUtils::GetPropertyValueAsString(UBlueprint* InBlueprint, FPropert
 	FString outValue;
 	UObject* generatedCDO = InBlueprint->GeneratedClass->GetDefaultObject();
 	void* propertyAddr = InProperty->ContainerPtrToValuePtr<void>(generatedCDO);
-	InProperty->ExportTextItem(outValue, propertyAddr, propertyAddr, nullptr, PPF_SerializedAsImportText);
+	InProperty->ExportText_Direct(outValue, propertyAddr, propertyAddr, nullptr, PPF_SerializedAsImportText);
 	return outValue;
 }
 
 
-void FElgKEWUtils::SetPropertyValueAsString(UBlueprint* InBlueprint, FProperty* InProperty, FString InValue)
+void FElgKEWUtils::SetPropertyValueAsString(UBlueprint* InBlueprint, FProperty* InProperty, const FString& InValue)
 {
 	check(InBlueprint);
 	check(InProperty);
@@ -780,12 +790,12 @@ void FElgKEWUtils::SetPropertyValueAsString(UBlueprint* InBlueprint, FProperty* 
 	InBlueprint->Modify();
 	UObject* generatedCDO = InBlueprint->GeneratedClass->GetDefaultObject();
 	void* propertyAddr = InProperty->ContainerPtrToValuePtr<void>(generatedCDO);
-	InProperty->ImportText(*InValue, propertyAddr, 0, generatedCDO);
+	InProperty->ImportText_Direct(*InValue, propertyAddr, generatedCDO, 0);
 	FBlueprintEditorUtils::MarkBlueprintAsModified(InBlueprint);
 }
 
 
-void FElgKEWUtils::SetVariableCategory(UBlueprint* InBlueprint, const FName InVariableName, FText InNewCategory)
+void FElgKEWUtils::SetVariableCategory(UBlueprint* InBlueprint, const FName InVariableName, const FText& InNewCategory)
 {
 	// Remove excess whitespace and prevent categories with just spaces
 	FText CategoryName = FText::TrimPrecedingAndTrailing(InNewCategory);
@@ -944,8 +954,6 @@ TArray<FString> FElgKEWUtils::GetCategoryTextsAsString(UBlueprint* InBlueprint, 
 	// Pull categories from overridable functions
 	for (TFieldIterator<UFunction> FunctionIt(InBlueprint->ParentClass, EFieldIteratorFlags::IncludeSuper); FunctionIt; ++FunctionIt) {
 		const UFunction* Function = *FunctionIt;
-		const FName FunctionName = Function->GetFName();
-
 		if (UEdGraphSchema_K2::CanKismetOverrideFunction(Function) && !UEdGraphSchema_K2::FunctionCanBePlacedAsEvent(Function)) {
 			FText FunctionCategory = FObjectEditorUtils::GetCategoryText(Function);
 
@@ -1021,8 +1029,8 @@ EBPElgKEWPropertyFlags FElgKEWUtils::ConvertFromEPropertyFlags(EPropertyFlags In
 	case EPropertyFlags::CPF_NativeAccessSpecifierProtected:return EBPElgKEWPropertyFlags::CPF_NativeAccessSpecifierProtected;
 	case EPropertyFlags::CPF_NativeAccessSpecifierPrivate:	return EBPElgKEWPropertyFlags::CPF_NativeAccessSpecifierPrivate;
 	case EPropertyFlags::CPF_SkipSerialization:				return EBPElgKEWPropertyFlags::CPF_SkipSerialization;
+	default:												return EBPElgKEWPropertyFlags::CPF_None;  
 	}
-	return EBPElgKEWPropertyFlags::CPF_None;
 }
 
 EPropertyFlags FElgKEWUtils::ConvertToEPropertyFlags(EBPElgKEWPropertyFlags InFlag)
@@ -1078,8 +1086,8 @@ EPropertyFlags FElgKEWUtils::ConvertToEPropertyFlags(EBPElgKEWPropertyFlags InFl
 	case EBPElgKEWPropertyFlags::CPF_NativeAccessSpecifierProtected:return EPropertyFlags::CPF_NativeAccessSpecifierProtected;
 	case EBPElgKEWPropertyFlags::CPF_NativeAccessSpecifierPrivate:	return EPropertyFlags::CPF_NativeAccessSpecifierPrivate;
 	case EBPElgKEWPropertyFlags::CPF_SkipSerialization:				return EPropertyFlags::CPF_SkipSerialization;
+	default:														return EPropertyFlags::CPF_None;
 	}
-	return EPropertyFlags::CPF_None;
 }
 
 
@@ -1134,12 +1142,10 @@ UElgBESGraphFunctionPin* FElgKEWUtils::GetInputPinVariable(UBlueprint* InBluepri
 {
 	UElgBESGraphFunctionPin* outVar = nullptr;
 	if (!IsGraphAFunction(InGraph)) return outVar;
-	UK2Node_FunctionEntry* entryNode;
 	TArray<UK2Node_FunctionEntry*> EntryNodes;
 	InGraph->GetNodesOfClass(EntryNodes);
 	if (EntryNodes.Num() == 1) {
-		entryNode = EntryNodes[0];
-		if (entryNode) {
+		if (UK2Node_FunctionEntry* entryNode = EntryNodes[0]) {
 			for (UEdGraphPin* pin : entryNode->Pins) {
 				if (NameToPinCategoryEnum(pin->PinType.PinCategory) == EBPElgKEWPinCategory::PC_Exec) continue;
 				if (pin->PinName == InName) {
@@ -1168,12 +1174,10 @@ TArray<UElgBESGraphFunctionPin*> FElgKEWUtils::GetOutputPinVariables(UBlueprint*
 {
 	TArray<UElgBESGraphFunctionPin*> outVars;
 	if (!IsGraphAFunction(InGraph)) return outVars;
-	UK2Node_FunctionResult* entryNode;
 	TArray<UK2Node_FunctionResult*> EntryNodes;
 	InGraph->GetNodesOfClass(EntryNodes);
 	if (EntryNodes.Num() == 1) {
-		entryNode = EntryNodes[0];
-		if (entryNode) {
+		if (UK2Node_FunctionResult* entryNode = EntryNodes[0]) {
 			for (UEdGraphPin* pin : entryNode->Pins) {
 				if (NameToPinCategoryEnum(pin->PinType.PinCategory) == EBPElgKEWPinCategory::PC_Exec) continue;
 				outVars.Add(UElgBESGraphFunctionPin::MakeGraphPinVariable(InBlueprint, InGraph, entryNode, pin));
@@ -1187,12 +1191,10 @@ UElgBESGraphFunctionPin* FElgKEWUtils::GetOutputPinVariable(UBlueprint* InBluepr
 {
 	UElgBESGraphFunctionPin* outVar = nullptr;
 	if (!IsGraphAFunction(InGraph)) return outVar;
-	UK2Node_FunctionResult* entryNode;
 	TArray<UK2Node_FunctionResult*> EntryNodes;
 	InGraph->GetNodesOfClass(EntryNodes);
 	if (EntryNodes.Num() == 1) {
-		entryNode = EntryNodes[0];
-		if (entryNode) {
+		if (UK2Node_FunctionResult* entryNode = EntryNodes[0]) {
 			for (UEdGraphPin* pin : entryNode->Pins) {
 				if (NameToPinCategoryEnum(pin->PinType.PinCategory) == EBPElgKEWPinCategory::PC_Exec) continue;
 				if (pin->PinName == InName) {
@@ -1208,9 +1210,7 @@ void FElgKEWUtils::GetVariableIconFromPinType(const FEdGraphPinType InPinType, F
 {
 	
 	FLinearColor tint = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	FSlateIcon icon = UK2Node_Variable::GetVarIconFromPinType(InPinType, tint);
 	const FSlateBrush* iconBrush = FBlueprintEditorUtils::GetIconFromPin(InPinType, false);
-	//OutBrush = *icon.GetOptionalIcon();
 	OutBrush = *iconBrush;
 	OutBrush.TintColor = tint;
 }
@@ -1244,21 +1244,21 @@ bool FElgKEWUtils::NameValidator(UBlueprint* InBlueprint, const FName InOldName,
 		scopeLocalVariable = NULL;		
 	}
 	TSharedPtr<INameValidatorInterface> NameValidator = MakeShareable(new FKismetNameValidator(InBlueprint, InOldName, scopeLocalVariable));
-	EValidatorResult ValidatorResult = NameValidator->IsValid(InNewName.ToString());
-	
-	switch (ValidatorResult) {
-	case EValidatorResult::AlreadyInUse: 
-		OutErrorMessage = FString::Printf(TEXT("%s is in use by another variable or function!"), *InNewName.ToString()); 
-		return false;
-	case  EValidatorResult::EmptyName:
-		OutErrorMessage = FString(TEXT("Names cannot be left blank!"));
-		return false;
-	case EValidatorResult::TooLong:
-		OutErrorMessage = FString::Printf(TEXT("Names must have fewer than %s characters!"), *FString::FromInt(FKismetNameValidator::GetMaximumNameLength()));
-		return false;
-	case EValidatorResult::LocallyInUse:
-		OutErrorMessage = FString(TEXT("Conflicts with another local variable or function parameter!"));
-		return false;
+
+	switch (NameValidator->IsValid(InNewName.ToString())) {
+		case EValidatorResult::AlreadyInUse: 
+			OutErrorMessage = FString::Printf(TEXT("%s is in use by another variable or function!"), *InNewName.ToString()); 
+			return false;
+		case  EValidatorResult::EmptyName:
+			OutErrorMessage = FString(TEXT("Names cannot be left blank!"));
+			return false;
+		case EValidatorResult::TooLong:
+			OutErrorMessage = FString::Printf(TEXT("Names must have fewer than %s characters!"), *FString::FromInt(FKismetNameValidator::GetMaximumNameLength()));
+			return false;
+		case EValidatorResult::LocallyInUse:
+			OutErrorMessage = FString(TEXT("Conflicts with another local variable or function parameter!"));
+			return false;
+		default: break;
 	}
 
 	OutErrorMessage = TEXT("Success!");
@@ -1267,7 +1267,7 @@ bool FElgKEWUtils::NameValidator(UBlueprint* InBlueprint, const FName InOldName,
 
 
 
-UFunction* FElgKEWUtils::GetLocalVaribleScope(UFunction* InFunction, const FName InName)
+UFunction* FElgKEWUtils::GetLocalVariableScope(UFunction* InFunction, const FName InName)
 {
 	if (FProperty* variableProperty = FElgKEWUtils::GetFunctionProperty(InFunction, InName)) {
 		return variableProperty->GetOwner<UFunction>();
@@ -1444,7 +1444,7 @@ FS_ElgFunctionInfo FElgKEWUtils::CreateFunctionInfo(const UFunction* InFunction)
 }
 
 
-EBPElgKEWWFunctionType FElgKEWUtils::GetFuctionType(const UEdGraph* InFunctionGraph)
+EBPElgKEWWFunctionType FElgKEWUtils::GetFunctionType(const UEdGraph* InFunctionGraph)
 {
 	EBPElgKEWWFunctionType functionType = EBPElgKEWWFunctionType::Function;
 	if (InFunctionGraph) {
@@ -1501,8 +1501,7 @@ bool FElgKEWUtils::AddOverridableFunction(UBlueprint* InBlueprint, const FName I
 	TSet<FName> graphNames;
 	FBlueprintEditorUtils::GetAllGraphNames(InBlueprint, graphNames);
 	if (UEdGraphSchema_K2::FunctionCanBePlacedAsEvent(overrideFunc) && !graphNames.Contains(InFunctionName) && eventGraph) {
-		UK2Node_Event* existingNode = FBlueprintEditorUtils::FindOverrideForFunction(InBlueprint, overrideFuncClass, InFunctionName);
-		if (existingNode) {
+		if (UK2Node_Event* existingNode = FBlueprintEditorUtils::FindOverrideForFunction(InBlueprint, overrideFuncClass, InFunctionName)) {
 			FKismetEditorUtilities::BringKismetToFocusAttentionOnObject(existingNode);
 			return true;
 		}
@@ -1524,8 +1523,7 @@ bool FElgKEWUtils::AddOverridableFunction(UBlueprint* InBlueprint, const FName I
 		}
 	}
 	else {
-		UEdGraph* const existingGraph = FindObject<UEdGraph>(InBlueprint, *InFunctionName.ToString());
-		if (existingGraph)
+		if (UEdGraph* const existingGraph = FindObject<UEdGraph>(InBlueprint, *InFunctionName.ToString()))
 		{
 			FKismetEditorUtilities::BringKismetToFocusAttentionOnObject(existingGraph);
 			return true;
@@ -1572,7 +1570,7 @@ bool FElgKEWUtils::IsNodeConnected(UEdGraphNode* InNode)
 		}
 	}
 	// no exec pins but we have a data connected so its ok or ...
-	//  if the node dont have any input exec pins, like Event Tick, 
+	//  if the node don't have any input exec pins, like Event Tick, 
 	//  but has output connection then its fine anyway
 	if (!bHasExec && bConnectedFromData || !bHasInput && bConnectedFrom) {
 		bConnectedIn = true;
@@ -1613,7 +1611,7 @@ FName FElgKEWUtils::DuplicateVariable(UBlueprint* InBlueprint, FProperty* InVari
 }
 
 
-UEdGraph* FElgKEWUtils::DuplcateGraph(UBlueprint* InBlueprint, UEdGraph* InGraph)
+UEdGraph* FElgKEWUtils::DuplicateGraph(UBlueprint* InBlueprint, UEdGraph* InGraph)
 {
 	check(InGraph);
 	// Only function, anim graph and macro duplication is supported
@@ -1709,7 +1707,7 @@ void FElgKEWUtils::ChangeVariableNodeReferenceToLocal(UBlueprint* InBlueprint, U
 {
 	check(InBlueprint);
 	check(InNodeToUpdate);
-	UFunction* varScope = GetLocalVaribleScope(InFunction, InVariableName);
+	UFunction* varScope = GetLocalVariableScope(InFunction, InVariableName);
 	FProperty* varProperty = GetFunctionProperty(InFunction, InVariableName);
 	check(varProperty);
 	const UEdGraphSchema_K2* Schema = Cast<const UEdGraphSchema_K2>(InNodeToUpdate->GetSchema());
@@ -1731,11 +1729,11 @@ void FElgKEWUtils::ChangeVariableNodeReferenceToPinVar(UBlueprint* InBlueprint, 
 }
 
 
-void FElgKEWUtils::GetUnsupportedPinsForProperty(UK2Node_Variable* InNode, FEdGraphPinType InNewPinType, TArray<class UEdGraphPin*>& OutBroken)
+void FElgKEWUtils::GetUnsupportedPinsForProperty(UK2Node_Variable* InNode, const FEdGraphPinType& InNewPinType, TArray<UEdGraphPin*>& OutBroken)
 {
 	if (const UEdGraphSchema_K2* Schema = Cast<const UEdGraphSchema_K2>(InNode->GetSchema())) {
 		if (UEdGraphPin* Pin = InNode->FindPin(InNode->GetVarName())) {
-			for (TArray<class UEdGraphPin*>::TIterator i(Pin->LinkedTo); i; i++) {
+			for (TArray<UEdGraphPin*>::TIterator i(Pin->LinkedTo); i; i++) {
 				UEdGraphPin* Link = *i;
 				if (false == Schema->ArePinTypesCompatible(InNewPinType, Link->PinType)) {
 					OutBroken.Add(Link);
